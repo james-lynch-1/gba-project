@@ -1,0 +1,26 @@
+{
+  "configurations": [
+    {
+      "name": "(gdb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "targetArchitecture": "arm",
+      "program": "${workspaceFolder}/gba-project.elf",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerServerAddress": "localhost:2345",
+      "linux": {
+                "miDebuggerPath": "${env:DEVKITARM}/bin/arm-none-eabi-gdb",
+                "setupCommands": [
+                    {
+                        "text": "shell \"mgba-qt\" -g \"${workspaceFolder}/gba-project.elf\" &"
+                    }
+                ]
+            },
+    }
+  ]
+}
