@@ -1,7 +1,7 @@
 # GBA project
 A game implemented in C. In progress. Winner of the "Exists and is playable" award ~0.2 years running  
 Use mGBA https://mgba.io/ to run it, or actual hardware I suppose  
-The blue squid thing is named squinky ![squinky](https://github.com/james-lynch-1/gba-project/raw/master/src/squinky.png "Squinky")  
+The blue squid thing is named squinky ![squinky](https://raw.githubusercontent.com/james-lynch-1/gba-project/refs/heads/main/squinky.png) 
 
 ## CONTROLS:
 D-pad: move character  
