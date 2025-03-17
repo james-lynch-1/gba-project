@@ -37,26 +37,6 @@
 #define ILK_PLAYER  0
 #define ILK_FELLA   1
 
-// attack ranges
-#define RANGE_CROSS 0
-#define RANGE_HLINE 1
-#define RANGE_VLINE 2
-#define RANGE_HLINEL 3
-#define RANGE_HLINER 4
-#define RANGE_VLINET 5
-#define RANGE_VLINEB 6
-#define RANGE_Q0 7
-#define RANGE_Q1 8
-#define RANGE_Q2 9
-#define RANGE_Q3 10
-#define RANGE_Q0Q2 11
-#define RANGE_Q1Q3 12
-#define RANGE_Q0Q1 13
-#define RANGE_Q3Q4 14
-#define RANGE_Q0Q3 15
-#define RANGE_Q1Q2 16
-
-
 typedef struct Hitbox_ {
     u8 width;
     u8 height;
@@ -148,7 +128,7 @@ void handlePlayerAttacks(Entity* ent, int crosshairEntColl);
 
 // void handleCrosshairEntColl(Entity* ent, int crosshairEntColl);
 
-void basicAttack(Entity* ent, AttackInstance* attack);
+void doAttack(Entity* ent, u8 attackRangeValue);
 
 void updateAnimation(Entity* ent, u8 prevAnimState);
 

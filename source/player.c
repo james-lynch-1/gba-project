@@ -70,7 +70,18 @@ void handleInput() {
         // speed.HALF.HI = 1;
         // speed.HALF.LO = 0;
         // player->rotation.WORD = 0;
-        // pushNewAttack(&basicAtk);
+        switch (key_is_down(KEY_RIGHT) + key_is_down(KEY_DOWN) +
+            key_is_down(KEY_LEFT) + key_is_down(KEY_UP)) {
+                case 0x10: pushNewAttack(&eastAtk); break;
+                case 0x80: pushNewAttack(&southAtk); break;
+                case 0x20: pushNewAttack(&westAtk); break;
+                case 0x40: pushNewAttack(&northAtk); break;
+                case 0x90: pushNewAttack(&southeastAtk); break;
+                case 0xA0: pushNewAttack(&southwestAtk); break;
+                case 0x60: pushNewAttack(&northwestAtk); break;
+                case 0x50: pushNewAttack(&northeastAtk); break;
+                default: pushNewAttack(&crossAtk); break;
+        }
     }
 
     bool isSpinning = checkForSpin(player->dir);

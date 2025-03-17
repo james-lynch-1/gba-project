@@ -191,8 +191,18 @@ u32 checkCrosshairEntColl(Entity* ent, Position crosshairWorldPos) {
     int isInS = 2 * (entCornerPositions[1].y.WORD > crosshairWorldPos.y.WORD);
     int isInW = 4 * (entCornerPositions[0].x.WORD < crosshairWorldPos.x.WORD);
     int isInN = 8 * (entCornerPositions[0].y.WORD < crosshairWorldPos.y.WORD);
-    int coll = isInE + isInS + isInW + isInN;
-    return coll;
+    switch (isInE + isInS + isInW + isInN) {
+        case 11: return ATK_E_COLL;
+        case 7: return ATK_S_COLL;
+        case 14: return ATK_W_COLL;
+        case 13: return ATK_N_COLL;
+        case 3: return ATK_SE_COLL;
+        case 6: return ATK_SW_COLL;
+        case 12: return ATK_NW_COLL;
+        case 9: return ATK_NE_COLL;
+        case 15: return ATK_CTR_COLL;
+        default: return 0;
+    }
 }
 
 void handlePlayerAttacks(Entity* ent, int crosshairEntColl) {
@@ -200,64 +210,16 @@ void handlePlayerAttacks(Entity* ent, int crosshairEntColl) {
     Entity player = *entities;
     AttackInstance* atkInst = player.attacksActive;
     while (atkInst != NULL) {
-        for (int i = 0; i < MAX_ATK_RANGE; i++) {
-            if (atkInst->attack->range[i] == 0) break;
-            if (atkInst->attack->range[i] == crosshairEntColl && atkInst->timer <= atkInst->attack->duration) {
-                basicAttack(ent, atkInst);
-                break; // only one crosshairEntColl per ent, after all
-            }
-        }
+        if (atkInst->attack->range[crosshairEntColl] != 0 && atkInst->timer <= atkInst->attack->duration)
+            doAttack(ent, atkInst->attack->range[crosshairEntColl]);
         atkInst = atkInst->next;
     }
 }
 
-// void handleCrosshairEntColl(Entity* ent, int crosshairEntColl) {
-//     ent->animationState = ANIM_IDLE;
-//     switch (crosshairEntColl) {
-//         case ATK_SE_COLL: // SE
-//             // mgbaLog(CHAR VA "SE");
-//             // if in a special attack state, take appropriate damage
-//             // same for other quadrants/directions
-//             break;
-//         case ATK_NE_COLL: // NE
-//             // mgbaLog(CHAR VA "NE");
-//             break;
-//         case ATK_SW_COLL: // SW
-//             // mgbaLog(CHAR VA "SW");
-//             break;
-//         case ATK_NW_COLL: // NW
-//             // mgbaLog(CHAR VA "NW");
-//             break;
-//         case ATK_S_COLL: // E+S+W
-//             // mgbaLog(CHAR VA "S");
-//             break;
-//         case ATK_E_COLL: // E+S+N
-//             // mgbaLog(CHAR VA "E");
-//             break;
-//         case ATK_N_COLL: // E+W+N
-//             // mgbaLog(CHAR VA "N");
-//             break;
-//         case ATK_W_COLL: // S+W+N
-//             // mgbaLog(CHAR VA "W");
-//             break;
-//         case ATK_CTR_COLL: // centre
-//             basicAttack(ent);
-//             mgbaLog(U32 VA ent->health);
-//             break;
-//         default: break;
-//     }
-// }
-
-void basicAttack(Entity* ent, AttackInstance* atkInst) {
+void doAttack(Entity* ent, u8 attackRangeValue) {
     ent->animationState = ANIM_HURT;
-    ent->health -= atkInst->attack->dmg;
+    ent->health -= attackRangeValue;
 }
-
-// void quadrantAttack(Entity* ent) {
-//     while (entities->attacksActive != NULL) {
-
-//     }
-// }
 
 void updateAnimation(Entity* ent, u8 prevAnimState) {
     u8 frames = ent->animFrames;

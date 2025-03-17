@@ -23,7 +23,6 @@
 
 #define PLAYER_MAX_SPEED    0x30000
 #define MAX_ENTS            16
-#define MAX_ATK_RANGE       9
 
 // SBB defines
 /** Screen base block for bars (attack countdown/duration) layer */

@@ -8,6 +8,9 @@ D-pad: move character
 Spin D-pad clockwise: charge basic attack (max. 4 attacks active at once)  
 A/B: Move crosshair down/up  
 L/R: Move crosshair left/right  
+Start: Add new attack to attack list (debug feature)  
+&nbsp;&nbsp;&nbsp;&nbsp;Hold one of the eight directions to change the attack type (cardinal + diagonals)
+or no direction for a cross-shaped attack  
 Select: Change area  
 You can also go to the left/right edge of the screen to load a new area (you may become stuck)  
 
@@ -18,17 +21,20 @@ GBA file is included in the repo so just run that if you want
 ## IMPLEMENTED:
 Collision detection for player/enemies and player/environment  
 Reticle works and can be used to destroy enemies (red dots)  
+Different attack types (screen filling, top-left/top-right/bottom-left/bottom-right quadrant area of effect)  
 Dynamic memory allocation for enemies and player attacks  
 Countdown/time remaining UI for attacks  
 Multiple areas  
 
 ## TO BE IMPLEMENTED:
 Collectible weapons/attacks from enemies/item pickups  
-Other types of attacks (screen filling, topleft/topright/bottomleft/bottomright quadrant area of effect)  
+Basic enemy AI/movement  
 Shell script to convert exported Usenti maps to condensed collision maps  
 Inventory system  
-More detailed UI for player health, attacks, inventory etc.  
+Detailed UI for player health, attacks, inventory etc.  
+Audio  
 Removing copyright infringement  
+Fun  
 
 ## HOW TO MAKE A LEVEL
 1. Import tileset into Tiled https://www.mapeditor.org/ and make a level using those tiles  
