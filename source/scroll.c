@@ -1,30 +1,22 @@
-#include "scroll.h"
+#include "scene.h"
 
 extern Entity* entities;
 extern Scene* scene;
+extern Viewport vp;
 
 void handleScroll() {
     Entity* player = entities;
-    moveScreenOnMap(player, scene);
-    Position screenPos = {.x.HALF.HI = scene->screenX, .y.HALF.HI = scene->screenY};
+    moveViewportOnMap(player, scene);
+    updateBGTiles(scene);
+    Position screenPos = { .x.HALF.HI = scene->screenX, .y.HALF.HI = scene->screenY };
     movePlayerSpriteOnScreen(player, screenPos);
 }
 
-void moveScreenOnMap(Entity* ent, Scene* scene) {
-    scene->screenX = ent->position.x.HALF.HI - (SCREEN_WIDTH / 2);
-    scene->screenY = ent->position.y.HALF.HI - (SCREEN_HEIGHT / 2);
-
-    if (ent->position.x.HALF.HI < SCREEN_WIDTH / 2)
-        scene->screenX = 0;
-    if (ent->position.y.HALF.HI < SCREEN_HEIGHT / 2)
-        scene->screenY = 0;
-    if (ent->position.x.HALF.HI > (scene->mapWidthInMetatiles * 16) - SCREEN_WIDTH / 2)
-        scene->screenX = (scene->mapWidthInMetatiles * 16) - SCREEN_WIDTH;
-    if (ent->position.y.HALF.HI > (scene->mapHeightInMetatiles * 16) - SCREEN_HEIGHT / 2)
-        scene->screenY = (scene->mapHeightInMetatiles * 16) - SCREEN_HEIGHT;
-
-    REG_BG0HOFS = scene->screenX;
-    REG_BG0VOFS = scene->screenY;
+void moveViewportOnMap(Entity* ent, Scene* scene) {
+    vp.x = ent->position.x.HALF.HI - (SCR_W / 2);
+    vp.x = clamp(vp.x, vp.xMin, vp.xMax);
+    vp.y = ent->position.y.HALF.HI - (SCR_H / 2);
+    vp.y = clamp(vp.y, vp.yMin, vp.yMax);
 }
 
 void movePlayerSpriteOnScreen(Entity* player, Position screenPos) {
@@ -33,13 +25,35 @@ void movePlayerSpriteOnScreen(Entity* player, Position screenPos) {
     obj_set_attr(player->obj, player->obj->attr0, player->obj->attr1, player->obj->attr2 | ATTR2_PRIO(3));
 }
 
-void moveSpriteOnScreen(Entity* ent, Position offset)
-{
+void moveSpriteOnScreen(Entity* ent, Position offset) {
     obj_set_pos(ent->obj, ent->position.x.HALF.HI - scene->screenX - (ent->width / 2) + offset.x.HALF.HI,
-    ent->position.y.HALF.HI - scene->screenY - (ent->height / 2) + offset.y.HALF.HI);
+        ent->position.y.HALF.HI - scene->screenY - (ent->height / 2) + offset.y.HALF.HI);
 }
 
 bool checkIfOnScreen(Entity* ent) {
-    return ((ent->position.x.HALF.HI + ent->width / 2 > scene->screenX && ent->position.x.HALF.HI - ent->width / 2 < (scene->screenX + SCREEN_WIDTH)) &&
-        (ent->position.y.HALF.HI + ent->height / 2 > scene->screenY && ent->position.y.HALF.HI - ent->height / 2 < (scene->screenY + SCREEN_HEIGHT)));
+    return ((ent->position.x.HALF.HI + ent->width / 2 > scene->screenX && ent->position.x.HALF.HI - ent->width / 2 < (scene->screenX + SCR_W)) &&
+        (ent->position.y.HALF.HI + ent->height / 2 > scene->screenY && ent->position.y.HALF.HI - ent->height / 2 < (scene->screenY + SCR_H)));
+}
+
+// adapted from bigmap demo in libtonc-examples
+void updateBGTiles(Scene* scene) {
+    int oldTileX = (scene->screenX) / 8;
+    int oldTileY = (scene->screenY) / 8;
+    int tileX = vp.x / 8;
+    int tileY = vp.y / 8;
+
+    if (tileX < oldTileX) // scroll left
+        copyTileCol(scene, tileX, tileY);
+    else if (tileX > oldTileX) // scroll right
+        copyTileCol(scene, tileX + 31, tileY);
+    
+    if (tileY < oldTileY) // scroll up
+        copyTileRow(scene, tileX, tileY);
+    else if (tileY > oldTileY) // scroll down
+        copyTileRow(scene, tileX, tileY + 31);
+    scene->screenX = vp.x;
+    scene->screenY = vp.y;
+
+    REG_BG0HOFS = scene->screenX;
+    REG_BG0VOFS = scene->screenY;
 }

@@ -11,12 +11,11 @@ u32 getTileCollision(Position nextPos, Entity* ent, Scene* scene) {
     u32 tileCollision = 0;
     for (Direction dir = 0; dir < 8; dir++)
         tileCollision |= getEdgeCollision(nextPos, hitbox, dir, scene);
-    // mgbaLog(U32HEX VA tileCollision);
     return tileCollision;
 }
 
 inline int getTileCollisionPoint(int point[2], Scene* scene) {
-    const u16* collMap = scene->collisionMap;
+    const u16* collMap = scene->sceneData.collisionMap;
     return collMap[(point[1] / MT_WIDTH) * 32 + (point[0] / MT_WIDTH)];
 }
 
@@ -59,9 +58,9 @@ u32 getEdgeCollision(Position nextPos, Hitbox hb, Direction dir, Scene* scene) {
     }
     // return 0 | scene->collisionMap[coordToMetatile(nextPos, scene)] << (dir * COLL_BITWIDTH); // old collision maps
     // packed collision maps below:
-    CollisionTileRow* sglCollRowPtr = (CollisionTileRow*)scene->collisionMap;
-    CollisionTileRowDbl* dblCollRowPtr = (CollisionTileRowDbl*)scene->collisionMap;
-    if (scene->mapWidthInMetatiles == 16) {
+    CollisionTileRow256x256* sglCollRowPtr = (CollisionTileRow256x256*)scene->sceneData.collisionMap;
+    CollisionTileRow512x512* dblCollRowPtr = (CollisionTileRow512x512*)scene->sceneData.collisionMap;
+    if (scene->sceneData.mapWInMtiles == 16) {
         return 0 | (sglCollRowPtr[nextPos.y.HALF.HI / MT_WIDTH].halfSBBRow[nextPos.x.HALF.HI / 128] >>
             (nextPos.x.HALF.HI % 128 / 16 * COLL_BITWIDTH) & PACKED_COLLMAP_MASK) <<
             (dir * COLL_BITWIDTH);

@@ -1,5 +1,11 @@
 #ifndef constantsh
 #define constantsh
+
+// maximums (will change)
+#define PLAYER_MAX_SPEED    0x30000
+#define MAX_ENTS            16
+#define NUM_SCENES          3
+
 /** Metatile width, in pixels */
 #define MT_WIDTH            16
 #define MT_PER_ROW_64x64    32
@@ -9,6 +15,7 @@
 #define TILE_WIDTH          8
 #define TILES_PER_ROW_64x64 64
 #define TILES_PER_SBB_ROW   32
+#define TILEROWS_PER_SBB    32
 #define TILES_PER_SBB       1024
 /** Map width, in pixels */
 #define MAP_WIDTH_64x64     512
@@ -21,21 +28,31 @@
 /** Size of packed collision data for a single metatile, in bits */
 #define COLL_BITWIDTH       4
 
-#define PLAYER_MAX_SPEED    0x30000
-#define MAX_ENTS            16
-
 // SBB defines
 /** Screen base block for bars (attack countdown/duration) layer */
-#define BARS_SBB    26
+#define BARS_SBB            26
 /** Screen base block for crosshair layer */
-#define CHAIR_SBB   27
+#define CHAIR_SBB           27
 /** Screen base block for map layer */
-#define MAP_SBB     28
+#define MAP_SBB             31
 
 #define CROSSHAIRS_X_MIN    16
-#define CROSSHAIRS_X_MAX    SCREEN_WIDTH - 16
+#define CROSSHAIRS_X_MAX    SCR_W - 16
 #define CROSSHAIRS_Y_MIN    16
-#define CROSSHAIRS_Y_MAX    SCREEN_HEIGHT - 16
+#define CROSSHAIRS_Y_MAX    SCR_H - 16
 
-#define SPIN_WAIT_FRAMES  12
+#define SPIN_WAIT_FRAMES    12
+
+// crosshair-ent collision array indices
+#define ATK_E_COLL          0
+#define ATK_S_COLL          1
+#define ATK_W_COLL          2
+#define ATK_N_COLL          3
+#define ATK_SE_COLL         4
+#define ATK_SW_COLL         5
+#define ATK_NW_COLL         6
+#define ATK_NE_COLL         7
+#define ATK_CTR_COLL        8
+#define MAX_ATK_RANGE       9 // no. of elements in array (cardinals + quadrants + centre)
+
 #endif

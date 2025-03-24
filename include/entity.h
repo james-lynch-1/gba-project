@@ -37,68 +37,19 @@
 #define ILK_PLAYER  0
 #define ILK_FELLA   1
 
-typedef struct Hitbox_ {
-    u8 width;
-    u8 height;
-    s8 leftOffset; // offset from pos.x to get left edge coord
-    s8 rightOffset; // offset from pos.x to get right edge coord
-    s8 topOffset; // offset from pos.y to get top edge coord
-    s8 bottomOffset; // offset from pos.y to get bottom edge coord
-    s8 xOffset; // whole hitbox offset on x axis
-    s8 yOffset; // whole hitbox offset on y axis
-} Hitbox;
-
-typedef struct Entity_ {
-    // linked list
-    struct Entity_* prev; // 4 bytes
-    struct Entity_* next; // 4 bytes
-    bool toBeDeleted; // 4 bytes
-
-    // shadow OAM entries
-    OBJ_ATTR* obj; // 4 bytes
-    OBJ_AFFINE* obj_aff; // 4 bytes
-
-    // important
-    void (*moveSprite)(struct Entity_* ent, Position offset); // 4 bytes
-    int health; // 4 bytes
-    Position position; // 8 bytes
-    Hitbox hitbox; // 8 bytes
-    union SplitWord speed; // 4 bytes
-    union SplitWord rotation; // 4 bytes
-    Direction dir; // 4 bytes
-    u16 tid; // 2 bytes
-    u16 remoteControlCountdown; // 2 bytes. No. of frames before control is handed back to the player. 65535 means indefinite
-    AttackInstance* attacksActive; // 4 bytes
-    u8 affIndex; // 1 byte
-    u8 ilk; // 1 byte
-    u8 invincibleTime; // 1 byte
-
-    // visual
-    u8 pb; // 1 byte
-    u8 animationState; // 1 byte
-    u8 facing; // 1 byte
-    u8 facingLocked; // 1 byte
-    u8 animFrames; // 1 byte. how many frames ent has been in current animation state
-    u8 width; // 1 byte
-    u8 height; // 1 byte
-    u8 spriteShape; // 1 byte, needs to be shifted left by 12 to be used in OAM
-    u8 spriteSize; // 1 byte, needs to be shifted left by 12 to be used in OAM
-    u8 spriteType; // 1 byte, needs to be shifted left by ATTR0_MODE_SHIFT (8) to be used in OAM
-} Entity;
-
-// Collision data for 16 metatiles (1 SBB row / 1 32 tile-wide map) packed into two words.
-// 4 bits/tile -> 16 possible collision types per tile
-typedef union __attribute__((packed)) CollisionTileRow_ {
+/** Collision data for 16 metatiles (1 SBB row / 1 32 tile-wide map) packed into two words.
+4 bits/tile -> 16 possible collision types per tile */
+typedef union __attribute__((packed)) CollisionTileRow256x256_ {
     struct row {
         u8 t0 : 4; u8 t1 : 4; u8 t2 : 4; u8 t3 : 4; u8 t4 : 4; u8 t5 : 4; u8 t6 : 4; u8 t7 : 4;
         u8 t8 : 4; u8 t9 : 4; u8 t10 : 4; u8 t11 : 4; u8 t12 : 4; u8 t13 : 4; u8 t14 : 4; u8 t15 : 4;
     } row;
     u32 halfSBBRow[2];
-} CollisionTileRow;
+} CollisionTileRow256x256;
 
 /** Collision data for 32 metatiles (2 SBB rows / 1 64 tile-wide map) packed into four words.
 4 bits/tile -> 16 possible collision types per tile */
-typedef union __attribute__((packed)) CollisionTileRowDbl_ {
+typedef union __attribute__((packed)) CollisionTileRow512x512_ {
     struct rowDbl {
         u8 t0 : 4; u8 t1 : 4; u8 t2 : 4; u8 t3 : 4; u8 t4 : 4; u8 t5 : 4; u8 t6 : 4; u8 t7 : 4;
         u8 t8 : 4; u8 t9 : 4; u8 t10 : 4; u8 t11 : 4; u8 t12 : 4; u8 t13 : 4; u8 t14 : 4; u8 t15 : 4;
@@ -106,36 +57,42 @@ typedef union __attribute__((packed)) CollisionTileRowDbl_ {
         u8 t24 : 4; u8 t25 : 4; u8 t26 : 4; u8 t27 : 4; u8 t28 : 4; u8 t29 : 4; u8 t30 : 4; u8 t31 : 4;
     } row;
     u32 halfSBBRow[4];
-} CollisionTileRowDbl;
+} CollisionTileRow512x512;
 
+/** Collision data for 64 metatiles (4 SBB rows / 1 128 tile-wide map) packed into eight words.
+4 bits/tile -> 16 possible collision types per tile */
+typedef union __attribute__((packed)) CollisionTileRow1024x1024_ {
+    struct rowQdrpl {
+        u8 t0 : 4; u8 t1 : 4; u8 t2 : 4; u8 t3 : 4; u8 t4 : 4; u8 t5 : 4; u8 t6 : 4; u8 t7 : 4;
+        u8 t8 : 4; u8 t9 : 4; u8 t10 : 4; u8 t11 : 4; u8 t12 : 4; u8 t13 : 4; u8 t14 : 4; u8 t15 : 4;
+        u8 t16 : 4; u8 t17 : 4; u8 t18 : 4; u8 t19 : 4; u8 t20 : 4; u8 t21 : 4; u8 t22 : 4; u8 t23 : 4;
+        u8 t24 : 4; u8 t25 : 4; u8 t26 : 4; u8 t27 : 4; u8 t28 : 4; u8 t29 : 4; u8 t30 : 4; u8 t31 : 4;
+        u8 t32 : 4; u8 t33 : 4; u8 t34 : 4; u8 t35 : 4; u8 t36 : 4; u8 t37 : 4; u8 t38 : 4; u8 t39 : 4;
+        u8 t40 : 4; u8 t41 : 4; u8 t42 : 4; u8 t43 : 4; u8 t44 : 4; u8 t45 : 4; u8 t46 : 4; u8 t47 : 4;
+        u8 t48 : 4; u8 t49 : 4; u8 t50 : 4; u8 t51 : 4; u8 t52 : 4; u8 t53 : 4; u8 t54 : 4; u8 t55 : 4;
+        u8 t56 : 4; u8 t57 : 4; u8 t58 : 4; u8 t59 : 4; u8 t60 : 4; u8 t61 : 4; u8 t62 : 4; u8 t63 : 4;
+    } row;
+    u32 halfSBBRow[8];
+} CollisionTileRow1024x1024;
+
+// entities
 Entity* loadPlayer();
-
 Entity* loadEnt();
-
 void spawnFella(Position pos);
-
 void updateEnts();
-
 void deleteEnt(Entity* ent);
 
+// attacks
 void deleteNextAtkInstance(AttackInstance* atkInst);
-
 void pushNewAttack(Attack* atk);
-
 u32 checkCrosshairEntColl(Entity* ent, Position crosshairWorldPos);
-
 void handlePlayerAttacks(Entity* ent, int crosshairEntColl);
-
-// void handleCrosshairEntColl(Entity* ent, int crosshairEntColl);
-
 void doAttack(Entity* ent, u8 attackRangeValue);
-
 void updateAnimation(Entity* ent, u8 prevAnimState);
-
 bool checkPlayerEntCollision(Entity* player, Entity* currEnt);
-
 void doPlayerKnockback(Entity* ent);
 
+// hitbox
 int hBoxLOffset(Hitbox hitbox);
 int hBoxROffset(Hitbox hitbox);
 int hBoxTOffset(Hitbox hitbox);
@@ -144,7 +101,6 @@ int hBoxXOffset(Hitbox hitbox);
 int hBoxYOffset(Hitbox hitbox);
 
 // collision
-
 u32 getTileCollision(Position nextPos, Entity* ent, Scene* scene);
 int getTileCollisionPoint(int point[2], Scene* scene);
 u32 getEdgeCollision(Position nextPos, Hitbox hitbox, Direction dir, Scene* scene);

@@ -33,6 +33,6 @@ void updateQuadCountdownUI(int timer, int countdown, int duration, int atkNum) {
 }
 
 void updateCrosshair() {
-    REG_BG1HOFS = SCREEN_WIDTH + 20 - crosshairPos.x.HALF.HI;
-    REG_BG1VOFS = SCREEN_HEIGHT + 100 - crosshairPos.y.HALF.HI;
+    REG_BG1HOFS = SCR_W + 20 - crosshairPos.x.HALF.HI;
+    REG_BG1VOFS = SCR_H + 100 - crosshairPos.y.HALF.HI;
 }

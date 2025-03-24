@@ -52,7 +52,8 @@
         "div_lut.h": "c",
         "attacks.h": "c",
         "player.h": "c",
-        "queue.h": "c"
+        "queue.h": "c",
+        "uglybig.h": "c"
     },
     "VSCodeCounter.exclude": [
         "**/.gitignore",

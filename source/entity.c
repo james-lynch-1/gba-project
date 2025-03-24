@@ -7,9 +7,6 @@ extern Entity* entities;
 extern Scene* scene;
 extern int numEnts;
 extern Position crosshairPos;
-extern void moveSpriteOnScreen();
-extern void movePlayerSpriteOnScreen();
-extern bool checkIfOnScreen();
 extern int numAttacks;
 extern u32 frameCount;
 
@@ -154,7 +151,6 @@ void deleteEnt(Entity* ent) {
 
 void deleteNextAtkInstance(AttackInstance* atkInst) {
     AttackInstance* toBeDeleted = atkInst->next;
-    atkInst = toBeDeleted->next;
     free(toBeDeleted);
 }
 

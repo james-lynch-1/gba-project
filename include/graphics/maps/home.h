@@ -29,7 +29,7 @@ extern const unsigned short homeMap[1024];
 #define homePalLen 26
 extern const unsigned short homePal[14];
 
-extern CollisionTileRow homeColl[16];
+extern CollisionTileRow256x256 homeColl[16];
 
 #endif // GRIT_HOME_H
 

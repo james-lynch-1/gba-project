@@ -2,7 +2,9 @@
 #define playerh
 
 #include "entity.h"
+#include "scene.h"
 #include "initialise.h"
+#include "constants.h"
 
 void handleInput();
 Direction getDir(int direction[2], Direction dir);

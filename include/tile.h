@@ -6,12 +6,9 @@
 #include "scene.h"
 
 typedef struct MtTileArray_ {
-    u16 t0;
-    u16 t1;
-    u16 t2;
-    u16 t3;
+    u16 t0; u16 t1;
+    u16 t2; u16 t3;
 } MtTileArray;
-
 
 MtTileArray posToMtTiles(Position pos, Scene* scene);
 int coordToMetatile(Position pos, Scene* scene);

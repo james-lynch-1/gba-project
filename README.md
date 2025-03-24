@@ -1,7 +1,6 @@
-# GBA project
+# GBA project <img align="center" src="https://raw.githubusercontent.com/james-lynch-1/gba-project/refs/heads/main/squinky.png">
 A game implemented in C. In progress. Winner of the "Exists and is playable" award ~0.2 years running  
 Use mGBA https://mgba.io/ to run it, or actual hardware I suppose  
-The blue squid thing is named squinky ![squinky](https://raw.githubusercontent.com/james-lynch-1/gba-project/refs/heads/main/squinky.png) 
 
 ## CONTROLS:
 D-pad: move character  
@@ -15,7 +14,7 @@ Select: Change area
 You can also go to the left/right edge of the screen to load a new area (you may become stuck)  
 
 ## BUILDING:
-Get the DevKitPro toolchain first, then run "make" to build the project  
+Get the DevKitPro toolchain first https://devkitpro.org/wiki/Getting_Started, then run "make" to build the project  
 GBA file is included in the repo so just run that if you want  
 
 ## IMPLEMENTED:

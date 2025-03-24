@@ -11,7 +11,6 @@
 #include "initialise.h"
 #include "log.h"
 #include "ui.h"
-#include "scroll.h"
 #include "attacks.h"
 
 #endif

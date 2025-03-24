@@ -1,7 +1,5 @@
 #include <tonc.h>
 #include "player.h"
-#include "entity.h"
-#include "constants.h"
 #include "log.h"
 
 extern Entity* entities;
@@ -40,6 +38,9 @@ void handleInput() {
 
     if (!player->facingLocked) player->facing = getFacing(player);
 
+    // update affine stuff
+    updateEntityAffine(player);
+
     if (key_is_down(KEY_L)) {
         // player->rotation.WORD += 0x200;
         crosshairPos.x.WORD -= 0x10000;
@@ -52,11 +53,11 @@ void handleInput() {
     //     player->prev->toBeDeleted = true;
     // }
     if (key_hit(KEY_SELECT)) {
-        int id = (scene->sceneId) + 1;
+        int id = (scene->sceneData.sceneId) + 1;
         if (id >= NUM_SCENES) id = 0;
-        loadScene(scene, id);
         player->position.x.WORD = 72 << 16;
         player->position.y.WORD = 72 << 16;
+        loadScene(scene, id);
         return;
     }
     if (key_is_down(KEY_A)) {
@@ -72,15 +73,15 @@ void handleInput() {
         // player->rotation.WORD = 0;
         switch (key_is_down(KEY_RIGHT) + key_is_down(KEY_DOWN) +
             key_is_down(KEY_LEFT) + key_is_down(KEY_UP)) {
-                case 0x10: pushNewAttack(&eastAtk); break;
-                case 0x80: pushNewAttack(&southAtk); break;
-                case 0x20: pushNewAttack(&westAtk); break;
-                case 0x40: pushNewAttack(&northAtk); break;
-                case 0x90: pushNewAttack(&southeastAtk); break;
-                case 0xA0: pushNewAttack(&southwestAtk); break;
-                case 0x60: pushNewAttack(&northwestAtk); break;
-                case 0x50: pushNewAttack(&northeastAtk); break;
-                default: pushNewAttack(&crossAtk); break;
+            case 0x10: pushNewAttack(&eastAtk); break;
+            case 0x80: pushNewAttack(&southAtk); break;
+            case 0x20: pushNewAttack(&westAtk); break;
+            case 0x40: pushNewAttack(&northAtk); break;
+            case 0x90: pushNewAttack(&southeastAtk); break;
+            case 0xA0: pushNewAttack(&southwestAtk); break;
+            case 0x60: pushNewAttack(&northwestAtk); break;
+            case 0x50: pushNewAttack(&northeastAtk); break;
+            default: pushNewAttack(&crossAtk); break;
         }
     }
 
@@ -117,33 +118,27 @@ void handleInput() {
 
     nextPos = handleCollision(player, normalisedSpeed, nextPos, collision, scene);
 
-    if (nextPos.x.HALF.HI < 8) {
-        loadPreviousScene(scene);
-        player->position.x.WORD = ((scene->mapWidthInMetatiles * MT_WIDTH) - 8) << 16;
-        if (player->position.y.HALF.HI > scene->mapHeightInMetatiles * MT_WIDTH - hBoxBOffset(hb) - 2)
-            player->position.y.WORD = 245 << 16;
-        return;
-    }
-    if (nextPos.x.HALF.HI > scene->mapWidthInMetatiles * MT_WIDTH - 8) {
-        loadNextScene(scene);
-        player->position.x.WORD = 8 << 16;
-        if (player->position.y.HALF.HI > scene->mapHeightInMetatiles * MT_WIDTH - hBoxBOffset(hb) - 2)
-            player->position.y.WORD = 245 << 16;
-        return;
-    }
-    if (nextPos.y.HALF.HI < hBoxTOffset(hb) + 2) {
-        nextPos.y.HALF.HI = hBoxTOffset(hb) + 2;
-    }
-    if (nextPos.y.HALF.HI > scene->mapHeightInMetatiles * MT_WIDTH - hBoxBOffset(hb) - 2) {
-        nextPos.y.HALF.HI = scene->mapHeightInMetatiles * MT_WIDTH - hBoxBOffset(hb) - 2;
-    }
-
-    // update affine stuff
-    updateEntityAffine(player);
+    nextPos.y.HALF.HI = clamp(nextPos.y.HALF.HI, hBoxTOffset(hb) + 4,
+        scene->sceneData.mapHInMTiles * MT_WIDTH - hBoxBOffset(hb) - 1);
 
     player->position.x = nextPos.x;
     player->position.y = nextPos.y;
     player->speed = speed;
+
+    int nextId = NUM_SCENES;
+    if (player->position.x.HALF.HI < 8) {
+        nextId = scene->sceneData.sceneId == 0 ? NUM_SCENES - 1 : scene->sceneData.sceneId - 1;
+        player->position.x.HALF.HI = sceneDataArr[nextId].mapWInMtiles * MT_WIDTH - 8;
+    }
+    else if (player->position.x.HALF.HI > scene->sceneData.mapWInMtiles * MT_WIDTH - 8) {
+        nextId = scene->sceneData.sceneId == NUM_SCENES - 1 ? 0 : scene->sceneData.sceneId + 1;
+        player->position.x.HALF.HI = 8;
+    }
+    if (nextId != NUM_SCENES) {
+        player->position.y.HALF.HI = clamp(player->position.y.HALF.HI, hBoxTOffset(hb),
+            sceneDataArr[nextId].mapHInMTiles * MT_WIDTH - hBoxBOffset(hb) - 2);
+        loadScene(scene, nextId);
+    }
 }
 
 Direction getDir(int direction[2], Direction dir) {
@@ -243,10 +238,10 @@ Position handleCollision(Entity* player, union SplitWord normalisedSpeed, Positi
             u32 westCollBottom = getEdgeCollision(westCollTest, hb, SOUTHWEST, scene);
             u32 northCollLeft = getEdgeCollision(northCollTest, hb, NORTHWEST, scene);
             u32 northCollRight = getEdgeCollision(northCollTest, hb, NORTHEAST, scene);
-            bool isEastColl = ((eastCollTop + eastCollBottom) != 0);
-            bool isSouthColl = 2 * ((southCollLeft + southCollRight) != 0);
-            bool isWestColl = 4 * ((westCollTop + westCollBottom) != 0);
-            bool isNorthColl = 8 * ((northCollLeft + northCollRight) != 0);
+            bool isEastColl = eastCollTop + eastCollBottom != 0;
+            bool isSouthColl = southCollLeft + southCollRight != 0;
+            bool isWestColl = westCollTop + westCollBottom != 0;
+            bool isNorthColl = northCollLeft + northCollRight != 0;
             switch (player->dir) {
                 case NORTHEAST:
                     if (isNorthColl && isEastColl) break;

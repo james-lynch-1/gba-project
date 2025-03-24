@@ -30,7 +30,7 @@ extern const unsigned short grasslandMap[4096];
 extern const unsigned short grasslandPal[12];
 
 // extern const unsigned short grasslandCollision[1024];
-extern CollisionTileRowDbl grassColl[32];
+extern CollisionTileRow512x512 grasslandColl[32];
 
 #endif // GRIT_GRASSLAND_H
 

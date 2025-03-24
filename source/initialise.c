@@ -12,9 +12,9 @@ void initialise() {
     irq_add(II_VBLANK, NULL);
     oam_init(obj_buffer, MAX_ENTS);
     REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
-    REG_BG0CNT = BG_PRIO(3) | BG_CBB(0) | BG_SBB(28) | BG_4BPP | BG_REG_64x64; // map
-    REG_BG1CNT = BG_PRIO(2) | BG_CBB(3) | BG_SBB(27) | BG_4BPP | BG_REG_32x32; // crosshairs
-    REG_BG2CNT = BG_PRIO(1) | BG_CBB(2) | BG_SBB(26) | BG_4BPP | BG_REG_32x32; // bars/ui
+    REG_BG0CNT = BG_PRIO(3) | BG_CBB(0) | BG_SBB(MAP_SBB) | BG_4BPP | BG_REG_32x32; // map
+    REG_BG1CNT = BG_PRIO(2) | BG_CBB(3) | BG_SBB(CHAIR_SBB) | BG_4BPP | BG_REG_32x32; // crosshairs
+    REG_BG2CNT = BG_PRIO(1) | BG_CBB(2) | BG_SBB(BARS_SBB) | BG_4BPP | BG_REG_32x32; // bars/ui
     loadSprites();
     loadCrosshairs();
 }

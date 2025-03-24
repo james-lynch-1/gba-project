@@ -15,16 +15,16 @@ u32 coordToMtSeIndex(Position pos, Scene* scene) {
 
 /** Returns the metatile containing the supplied coordinates. Ignores SBBs */
 inline int coordToMetatile(Position pos, Scene* scene) {
-    return pos.y.HALF.HI / MT_WIDTH * scene->mapWidthInMetatiles + pos.x.HALF.HI / MT_WIDTH;
+    return pos.y.HALF.HI / MT_WIDTH * scene->sceneData.mapWInMtiles + pos.x.HALF.HI / MT_WIDTH;
 }
 
 /** Returns the screen entry index of the first tile of the supplied metatile */
 u32 metatileToSeIndex(int metatile, Scene* scene) {
-    int metaY = metatile / scene->mapWidthInMetatiles;
-    int metaX = metatile % scene->mapWidthInMetatiles;
+    int metaY = metatile / scene->sceneData.mapWInMtiles;
+    int metaX = metatile % scene->sceneData.mapWInMtiles;
     u32 ty = metaY * 2;
     u32 tx = metaX * 2;
-    u32 sbb = (ty / TILES_PER_SBB_ROW) * scene->mapWidthInMetatiles / MT_PER_SBB_ROW +
+    u32 sbb = (ty / TILES_PER_SBB_ROW) * scene->sceneData.mapWInMtiles / MT_PER_SBB_ROW +
         tx / TILES_PER_SBB_ROW;
     return sbb * 1024 + (ty % TILES_PER_SBB_ROW) * TILES_PER_SBB_ROW + (tx % TILES_PER_SBB_ROW);
 }
@@ -32,7 +32,7 @@ u32 metatileToSeIndex(int metatile, Scene* scene) {
 u32 coordToSeIndex(Position pos, Scene* scene) {
     u32 ty = pos.y.HALF.HI / TILE_WIDTH;
     u32 tx = pos.x.HALF.HI / TILE_WIDTH;
-    u32 sbb = (ty / TILES_PER_SBB_ROW) * scene->mapWidthInMetatiles / MT_PER_SBB_ROW +
+    u32 sbb = (ty / TILES_PER_SBB_ROW) * scene->sceneData.mapWInMtiles / MT_PER_SBB_ROW +
         tx / TILES_PER_SBB_ROW;
     return sbb * 1024 + (ty % TILES_PER_SBB_ROW) * TILES_PER_SBB_ROW + (tx % TILES_PER_SBB_ROW);
 }

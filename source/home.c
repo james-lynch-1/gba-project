@@ -221,7 +221,7 @@ const unsigned short homePal[14] __attribute__((aligned(4))) =
 	0x2EDF,0x0486,0x11B6,0x2529,0x0000,
 };
 
-CollisionTileRow homeColl[16] __attribute__((aligned(4))) =
+CollisionTileRow256x256 homeColl[16] __attribute__((aligned(4))) =
 {
 	{.row = {0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0}},
 	{.row = {0,1,1,1,1,2,2,2,2,2,2,1,1,1,1,0}},

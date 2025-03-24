@@ -32,7 +32,7 @@ extern const unsigned short brinPal[8];
 
 // extern const unsigned short brinCollision[1024];
 
-extern CollisionTileRowDbl brinColl[32];
+extern CollisionTileRow512x512 brinColl[32];
 
 #endif // GRIT_BRIN_H
 
