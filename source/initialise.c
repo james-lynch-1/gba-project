@@ -14,7 +14,7 @@ void initialise() {
     REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
     REG_BG0CNT = BG_PRIO(3) | BG_CBB(0) | BG_SBB(MAP_SBB) | BG_4BPP | BG_REG_32x32; // map
     REG_BG1CNT = BG_PRIO(2) | BG_CBB(3) | BG_SBB(CHAIR_SBB) | BG_4BPP | BG_REG_32x32; // crosshairs
-    REG_BG2CNT = BG_PRIO(1) | BG_CBB(2) | BG_SBB(BARS_SBB) | BG_4BPP | BG_REG_32x32; // bars/ui
+    REG_BG2CNT = BG_PRIO(1) | BG_CBB(2) | BG_SBB(UI_SBB) | BG_4BPP | BG_REG_32x32; // bars/ui
     loadSprites();
     loadCrosshairs();
 }

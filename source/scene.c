@@ -89,52 +89,56 @@ void loadBG(const u16* pal, int palLen, const u16* tiles, int tilesLen, const u1
     Scene* scene) {
     memcpy16(pal_bg_mem, pal, palLen / sizeof(u16));
     memcpy32(&tile_mem[0][0], tiles, tilesLen / sizeof(u32));
-    int mapWInTiles = scene->sceneData.mapWInMtiles * 2;
-    int tx = vp.x / 8, ty = vp.y / 8;
-    int tileYMod = ty & 31;
-    int srcRow = ty;
-    for (int dstRow = tileYMod; dstRow < 32; dstRow++) // from ty to the end of the SBB
-        memcpy32(&se_mem[MAP_SBB][dstRow * TILES_PER_SBB_ROW], &map[srcRow++ * mapWInTiles + tx], 16);
-    for (int dstRow = 0; dstRow < tileYMod; dstRow++) // from the start of the SBB to ty
-        memcpy32(&se_mem[MAP_SBB][dstRow * TILES_PER_SBB_ROW], &map[srcRow++ * mapWInTiles + tx], 16);
+    int srcWInTiles = scene->sceneData.mapWInMtiles * 2;
+    int tX = vp.x / 8, tY = vp.y / 8;
+    int tXMod = tX & 31, tYMod = tY & 31;
+    int srcRow = tY;
+    for (int dstRow = tYMod; dstRow < 32; dstRow++) { // from tY to the end of the SBB
+        memcpy16(&se_mem[MAP_SBB][dstRow * SBB_WIDTH_T + tXMod], &map[srcRow * srcWInTiles + tX], 32 - tXMod);
+        memcpy16(&se_mem[MAP_SBB][dstRow * SBB_WIDTH_T], &map[srcRow++ * srcWInTiles + tX + 32 - tXMod], tXMod);
+    }
+    for (int dstRow = 0; dstRow < tYMod; dstRow++) { // from the start of the SBB to tY
+        memcpy16(&se_mem[MAP_SBB][dstRow * SBB_WIDTH_T + tXMod], &map[srcRow * srcWInTiles + tX], 32 - tXMod);
+        memcpy16(&se_mem[MAP_SBB][dstRow * SBB_WIDTH_T], &map[srcRow++ * srcWInTiles + tX + 32 - tXMod], tXMod);
+    }
 }
 
 void copyTileCol(Scene* scene, int tileX, int tileY) {
-    int tileXMod = tileX & 31;
-    int tileYMod = tileY & 31;
-    int srcWidthInTiles = scene->sceneData.mapWInMtiles * 2;
+    int tXMod = tileX & 31;
+    int tYMod = tileY & 31;
+    int srcWInTiles = scene->sceneData.mapWInMtiles * 2;
 
-    SCR_ENTRY* srcStartTile = (u16*)&scene->sceneData.sourceMap[tileY * srcWidthInTiles + tileX];
-    SCR_ENTRY* dstStartTile = (u16*)&se_mem[MAP_SBB][tileYMod * 32 + tileXMod];
+    SCR_ENTRY* srcStartTile = (u16*)&scene->sceneData.sourceMap[tileY * srcWInTiles + tileX];
+    SCR_ENTRY* dstStartTile = (u16*)&se_mem[MAP_SBB][tYMod * 32 + tXMod];
 
-    for (int i = tileYMod; i < 32; i++) {
+    for (int i = tYMod; i < 32; i++) {
         *dstStartTile = *srcStartTile;
         dstStartTile += 32;
-        srcStartTile += srcWidthInTiles;
+        srcStartTile += srcWInTiles;
     }
 
     dstStartTile -= SBB_SIZE / sizeof(SCR_ENTRY);
 
-    for (int i = 0; i < tileYMod; i++) {
+    for (int i = 0; i < tYMod; i++) {
         *dstStartTile = *srcStartTile;
         dstStartTile += 32;
-        srcStartTile += srcWidthInTiles;
+        srcStartTile += srcWInTiles;
     }
 }
 
 void copyTileRow(Scene* scene, int tileX, int tileY) {
-    int tileXMod = tileX & 31;
-    int tileYMod = tileY & 31;
-    int srcWidthInTiles = scene->sceneData.mapWInMtiles * 2;
+    int tXMod = tileX & 31;
+    int tYMod = tileY & 31;
+    int srcWInTiles = scene->sceneData.mapWInMtiles * 2;
 
-    SCR_ENTRY* srcStartTile = (u16*)&scene->sceneData.sourceMap[tileY * srcWidthInTiles + tileX];
-    SCR_ENTRY* dstStartTile = (u16*)&se_mem[MAP_SBB][tileYMod * 32 + tileXMod];
+    SCR_ENTRY* srcStartTile = (u16*)&scene->sceneData.sourceMap[tileY * srcWInTiles + tileX];
+    SCR_ENTRY* dstStartTile = (u16*)&se_mem[MAP_SBB][tYMod * 32 + tXMod];
 
-    for (int i = tileXMod; i < 32; i++)
+    for (int i = tXMod; i < 32; i++)
         *dstStartTile++ = *srcStartTile++;
 
-    dstStartTile -= TILEROWS_PER_SBB;
+    dstStartTile -= SBB_HEIGHT_T;
 
-    for (int i = 0; i < tileXMod; i++)
+    for (int i = 0; i < tXMod; i++)
         *dstStartTile++ = *srcStartTile++;
 }

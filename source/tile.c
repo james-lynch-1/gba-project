@@ -3,7 +3,7 @@
 inline MtTileArray posToMtTiles(Position pos, Scene* scene) {
     u32 tile0 = coordToMtSeIndex(pos, scene);
     MtTileArray tiles = { .t0 = tile0, .t1 = tile0 + 1,
-                         .t2 = tile0 + TILES_PER_SBB_ROW, .t3 = tile0 + TILES_PER_SBB_ROW + 1 };
+                         .t2 = tile0 + SBB_WIDTH_T, .t3 = tile0 + SBB_WIDTH_T + 1 };
     return tiles;
 }
 
@@ -24,15 +24,15 @@ u32 metatileToSeIndex(int metatile, Scene* scene) {
     int metaX = metatile % scene->sceneData.mapWInMtiles;
     u32 ty = metaY * 2;
     u32 tx = metaX * 2;
-    u32 sbb = (ty / TILES_PER_SBB_ROW) * scene->sceneData.mapWInMtiles / MT_PER_SBB_ROW +
-        tx / TILES_PER_SBB_ROW;
-    return sbb * 1024 + (ty % TILES_PER_SBB_ROW) * TILES_PER_SBB_ROW + (tx % TILES_PER_SBB_ROW);
+    u32 sbb = (ty / SBB_WIDTH_T) * scene->sceneData.mapWInMtiles / SBB_WIDTH_MT +
+        tx / SBB_WIDTH_T;
+    return sbb * 1024 + (ty % SBB_WIDTH_T) * SBB_WIDTH_T + (tx % SBB_WIDTH_T);
 }
 
 u32 coordToSeIndex(Position pos, Scene* scene) {
     u32 ty = pos.y.HALF.HI / TILE_WIDTH;
     u32 tx = pos.x.HALF.HI / TILE_WIDTH;
-    u32 sbb = (ty / TILES_PER_SBB_ROW) * scene->sceneData.mapWInMtiles / MT_PER_SBB_ROW +
-        tx / TILES_PER_SBB_ROW;
-    return sbb * 1024 + (ty % TILES_PER_SBB_ROW) * TILES_PER_SBB_ROW + (tx % TILES_PER_SBB_ROW);
+    u32 sbb = (ty / SBB_WIDTH_T) * scene->sceneData.mapWInMtiles / SBB_WIDTH_MT +
+        tx / SBB_WIDTH_T;
+    return sbb * 1024 + (ty % SBB_WIDTH_T) * SBB_WIDTH_T + (tx % SBB_WIDTH_T);
 }

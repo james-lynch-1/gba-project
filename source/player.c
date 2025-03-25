@@ -55,8 +55,8 @@ void handleInput() {
     if (key_hit(KEY_SELECT)) {
         int id = (scene->sceneData.sceneId) + 1;
         if (id >= NUM_SCENES) id = 0;
-        player->position.x.WORD = 72 << 16;
-        player->position.y.WORD = 72 << 16;
+        player->position.x.WORD = 180 << 16;
+        player->position.y.WORD = 160 << 16;
         loadScene(scene, id);
         return;
     }

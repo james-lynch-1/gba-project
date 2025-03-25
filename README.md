@@ -8,10 +8,9 @@ Spin D-pad clockwise: charge basic attack (max. 4 attacks active at once)
 A/B: Move crosshair down/up  
 L/R: Move crosshair left/right  
 Start: Add new attack to attack list (debug feature)  
-&nbsp;&nbsp;&nbsp;&nbsp;Hold one of the eight directions to change the attack type (cardinal + diagonals)
-or no direction for a cross-shaped attack  
+(Hold one of the eight directions to change the attack type (cardinal + diagonals), or no direction for a cross-shaped attack.)  
 Select: Change area  
-You can also go to the left/right edge of the screen to load a new area (you may become stuck)  
+You can also go to the left/right edge of the screen to load a new area (you may become stuck).  
 
 ## BUILDING:
 Get the DevKitPro toolchain first https://devkitpro.org/wiki/Getting_Started, then run "make" to build the project  
@@ -26,13 +25,13 @@ Countdown/time remaining UI for attacks
 Multiple areas  
 
 ## TO BE IMPLEMENTED:
+Memory manager for sprite VRAM
 Collectible weapons/attacks from enemies/item pickups  
 Basic enemy AI/movement  
 Shell script to convert exported Usenti maps to condensed collision maps  
 Inventory system  
 Detailed UI for player health, attacks, inventory etc.  
 Audio  
-Removing copyright infringement  
 Fun  
 
 ## HOW TO MAKE A LEVEL
