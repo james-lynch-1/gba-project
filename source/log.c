@@ -28,7 +28,7 @@ void mgbaLog(Type type, void* messagePtr) {
         case SOUTHWEST: strcpy(dirStr, "Southwest"); break;
         case NORTHEAST: strcpy(dirStr, "Northeast"); break;
         case NORTHWEST: strcpy(dirStr, "Northwest"); break;
-        default: break;
+        default: strcpy(dirStr, "Stationary"); break;
         }
         length = sprintf(message, "direction: %s", dirStr);
         break;
@@ -41,7 +41,7 @@ void mgbaLog(Type type, void* messagePtr) {
     case INTHEX:
         int numInt = *(int*)messagePtr;
         char* hex = toHex(numInt);
-        length = sprintf(message, "u32hex: %s", hex);
+        length = sprintf(message, "inthex: %s", hex);
         free(hex);
         break;
     case S16:
@@ -52,6 +52,12 @@ void mgbaLog(Type type, void* messagePtr) {
         break;
     case U16:
         length = sprintf(message, "u16: %u", *(u16*)messagePtr);
+        break;
+    case U16HEX:
+        u16 numHex16 = *(u16*)messagePtr;
+        hex = toHex(numHex16);
+        length = sprintf(message, "u16hex: %s", hex);
+        free(hex);
         break;
     case U32:
         length = sprintf(message, "u32: %u", *(u32*)messagePtr);

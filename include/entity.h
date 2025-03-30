@@ -8,24 +8,23 @@
 #include "constants.h"
 #include "ui.h"
 #include "attacks.h"
+#include "stdlib.h"
 
 // collision direction masks to get direction from a collision bitfield
 
-#define E_COLL_MASK      0x0000000Fu
-#define S_COLL_MASK      0x000000F0u
-#define W_COLL_MASK      0x00000F00u
-#define N_COLL_MASK      0x0000F000u
-#define SE_COLL_MASK     0x000F0000u
-#define SW_COLL_MASK     0x00F00000u
-#define NE_COLL_MASK     0x0F000000u
-#define NW_COLL_MASK     0xF0000000u
+#define X_CNTR_COLL_MASK    0x000000F0u
+#define Y_CNTR_COLL_MASK    0x000F0000u
+#define X_COLL_MASK         0x00000FFFu
+#define Y_COLL_MASK         0x00FFF000u
+#define X_CRNR_COLL_MASK    0x00000F0Fu
+#define Y_CRNR_COLL_MASK    0x00F0F000u
+#define X_CRNR_COLL_1_MASK  0x0000000Fu
+#define X_CRNR_COLL_2_MASK  0x00000F00u
+#define Y_CRNR_COLL_1_MASK  0x0000F000u
+#define Y_CRNR_COLL_2_MASK  0x00F00000u
 
 #define PACKED_COLLMAP_MASK 0x0000000Fu
-
-#define X_COLL_MASK      0X00000F0Fu
-#define Y_COLL_MASK      0x0000F0F0u
-
-#define CORNER_COLL_MASK 0xFFFF0000u
+#define CORNER_COLL_MASK    0x00F0FF0Fu
 #define COLL_MASK        0xFFFFFFFFu
 
 // animation state
@@ -101,8 +100,8 @@ int hBoxXOffset(Hitbox hitbox);
 int hBoxYOffset(Hitbox hitbox);
 
 // collision
-u32 getTileCollision(Position nextPos, Entity* ent, Scene* scene);
-int getTileCollisionPoint(int point[2], Scene* scene);
-u32 getEdgeCollision(Position nextPos, Hitbox hitbox, Direction dir, Scene* scene);
+u32 getPointCollision(Position pos, Scene* scene);
+u32 getEdgePointCollision(Position nextPos, Hitbox hb, Direction dir, Scene* scene);
+u32 getEdgeCollision(Position pos, Entity* ent, Direction cardDir, Scene* scene);
 
 #endif

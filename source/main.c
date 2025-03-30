@@ -7,9 +7,9 @@ OBJ_AFFINE* obj_aff_buffer = (OBJ_AFFINE*)obj_buffer;
 Entity* entities;
 Scene* scene;
 Viewport vp = {0, 0, 0, 0, 0, 0};
+Direction dPadDir = EAST;
 int numEnts = 0;
 int numAttacks = 0;
-Direction spinArray[8] = {8,8,8,8,8,8,8,8};
 Position crosshairPos = {.x.WORD = 8 << 16, .y.WORD = 8 << 16};
 
 int main() {

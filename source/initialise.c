@@ -40,9 +40,10 @@ void loadCrosshairs() {
 void loadSprites() {
     memcpy32(&tile_mem[4][0], squinky1Tiles, squinky1TilesLen / sizeof(u32));
     memcpy32(&tile_mem[4][16], squinky2Tiles, squinky2TilesLen / sizeof(u32));
-    memcpy32(&tile_mem[4][32], squinky4Tiles, squinky4TilesLen / sizeof(u32));
+    memcpy32(&tile_mem[4][32], squinky3Tiles, squinky3TilesLen / sizeof(u32));
+    memcpy32(&tile_mem[4][48], squinky4Tiles, squinky4TilesLen / sizeof(u32));
+    memcpy32(&tile_mem[4][64], debugBlobTiles, debugBlobTilesLen / sizeof(u32));
     memcpy32(pal_obj_bank[0], squinky1Pal, squinkyPalLen / sizeof(u32));
-    memcpy32(&tile_mem[4][48], debugBlobTiles, debugBlobTilesLen / sizeof(u32));
     memcpy32(&pal_obj_bank[1], debugBlobPal, debugBlobPalLen / sizeof(u32));
 }
 

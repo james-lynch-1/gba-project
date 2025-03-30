@@ -1,12 +1,12 @@
 # GBA project <img align="center" src="https://raw.githubusercontent.com/james-lynch-1/gba-project/refs/heads/main/squinky.png">
-A game implemented in C. In progress. Winner of the "Exists and is playable" award ~0.2 years running  
+A game implemented in C. In progress. Winner of the "Exists and is playable" award  
 Use mGBA https://mgba.io/ to run it, or actual hardware I suppose  
 
 ## CONTROLS:
-D-pad: move character  
-Spin D-pad clockwise: charge basic attack (max. 4 attacks active at once)  
-A/B: Move crosshair down/up  
-L/R: Move crosshair left/right  
+D-pad: move crosshair  
+Spin D-pad: charge basic attack (max. 4 attacks active at once)  
+L/R: Steer left/right  
+A: Move character forward  
 Start: Add new attack to attack list (debug feature)  
 (Hold one of the eight directions to change the attack type (cardinal + diagonals), or no direction for a cross-shaped attack.)  
 Select: Change area  

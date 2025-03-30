@@ -2,9 +2,11 @@
 #define constantsh
 
 // maximums (will change)
-#define PLAYER_MAX_SPEED    0x30000
+#define PLAYER_MAX_RADIUS   0x30000
 #define MAX_ENTS            16
 #define NUM_SCENES          3
+#define ANGLE_MIN           0
+#define ANGLE_MAX           65535
 /** Player sprite width, in pixels */
 #define PLAYER_SPR_WIDTH    32
 /** Player sprite height, in pixels */

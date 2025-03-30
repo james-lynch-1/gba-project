@@ -14,11 +14,42 @@ typedef enum {
     S16,
     S32,
     U16,
+    U16HEX,
     U32,
     U32HEX,
     SPLITWORD,
     USPLITWORD
 } Type;
+
+union SplitWord {
+    s32 WORD;
+    u32 WORD_U;
+    struct {
+        s16 LO, HI;
+    } HALF;
+    struct {
+        u16 LO, HI;
+    } HALF_U;
+    struct {
+        u8 byte0, byte1, byte2, byte3;
+    } BYTES;
+};
+
+union SplitHWord {
+    s16 HWORD;
+    u16 HWORD_U;
+    struct {
+        s8 LO : 4;
+        u16 HI : 12;
+    } HALF;
+    struct {
+        u8 LO : 4;
+        u16 HI : 12;
+    } HALF_U;
+    struct {
+        u8 byte1, byte2;
+    } BYTES;
+};
 
 typedef struct Viewport_ {
     s16 x, xMin, xMax,
@@ -27,16 +58,35 @@ typedef struct Viewport_ {
 
 typedef enum Direction_ {
     EAST = 0,
-    SOUTH = 1,
-    WEST = 2,
-    NORTH = 3,
-    SOUTHEAST = 4,
-    SOUTHWEST = 5,
-    NORTHWEST = 6,
-    NORTHEAST = 7,
-    STATIONARY = 8,
-    DIAGONAL = 4
+    NORTHEAST = 0x2000,
+    NORTH = 0x4000,
+    NORTHWEST = 0x6000,
+    WEST = 0x8000,
+    SOUTHWEST = 0xA000,
+    SOUTH = 0xC000,
+    SOUTHEAST = 0xE000,
+    STATIONARY = 0x10000
 } Direction;
+
+enum DirectionSmall_ {
+    EAST_S = 0,
+    NORTHEAST_S = 1,
+    NORTH_S = 2,
+    NORTHWEST_S = 3,
+    WEST_S = 4,
+    SOUTHWEST_S = 5,
+    SOUTH_S = 6,
+    SOUTHEAST_S = 7,
+    STATIONARY_S = 8
+};
+
+enum Angle_ { // common angles in radians (cardinal+diagonal)
+    ZEROPI = 0,
+    QUARTERPI = 0x2000,
+    HALFPI = 0x4000,
+    THREEQUARTERPI = 0x6000,
+    PI = 0x8000
+};
 
 typedef enum {
     NO_COLL = 0,
@@ -80,20 +130,6 @@ typedef struct AttackInstance_ {
     int timer; // always initialised to countdown + duration
 } AttackInstance;
 
-union SplitWord {
-    s32 WORD;
-    u32 WORD_U;
-    struct {
-        s16 LO, HI;
-    } HALF;
-    struct {
-        u16 LO, HI;
-    } HALF_U;
-    struct {
-        u8 byte0, byte1, byte2, byte3;
-    } BYTES;
-};
-
 typedef struct Position_ {
     union SplitWord x;
     union SplitWord y;
@@ -125,12 +161,13 @@ typedef struct Entity_ {
     int health; // 4 bytes
     Position position; // 8 bytes
     Hitbox hitbox; // 8 bytes
+    AttackInstance* attacksActive; // 4 bytes
+    union SplitWord radius; // 4 bytes. Top speed
     union SplitWord speed; // 4 bytes
-    union SplitWord rotation; // 4 bytes
-    Direction dir; // 4 bytes
+    u16 angleOffset; // 2 bytes
+    u16 angle; // 2 bytes
     u16 tid; // 2 bytes
     u16 remoteControlCountdown; // 2 bytes. No. of frames before control is handed back to the player. 65535 means indefinite
-    AttackInstance* attacksActive; // 4 bytes
     u8 affIndex; // 1 byte
     u8 ilk; // 1 byte
     u8 invincibleTime; // 1 byte
@@ -138,8 +175,6 @@ typedef struct Entity_ {
     // visual
     u8 pb; // 1 byte
     u8 animationState; // 1 byte
-    u8 facing; // 1 byte
-    u8 facingLocked; // 1 byte
     u8 animFrames; // 1 byte. how many frames ent has been in current animation state
     u8 width; // 1 byte
     u8 height; // 1 byte
@@ -153,17 +188,6 @@ typedef struct Node_ {
     struct Node_* next;
 } Node;
 
-union SplitHalfWord {
-    s16 HWORD;
-    u16 HWORD_U;
-    struct {
-        s8 LO, HI;
-    } HALF;
-    struct {
-        u8 LO, HI;
-    } HALF_U;
-};
-
 /** Rounds a fixed point number (SplitWord) by adding 0x8000 and masking off the fractional bits */
 inline u32 sWRound(union SplitWord num) {
     return (num.WORD + 0x8000) & 0xFFFF0000u;
@@ -171,6 +195,26 @@ inline u32 sWRound(union SplitWord num) {
 
 inline u16 sHWRound(union SplitWord num) {
     return (num.WORD + 0x8000) >> 16;
+}
+
+/** Round down to a multiple of pi (0x8000) */
+inline u32 piRound(u16 angle) {
+    return angle >> 15 << 15;
+}
+
+/** Round down to a multiple of pi (0x8000) */
+inline u32 hPiRound(u16 angle) {
+    return angle >> 14 << 14;
+}
+
+/** Returns 1 if angle is in positive X direction, -1 otherwise*/
+static inline int anglePositiveX(u16 angle) {
+    return !in_range(angle, 0x4000, 0xC000);
+}
+
+/** Returns 1 if angle is in positive Y direction (down), -1 otherwise*/
+static inline int anglePositiveY(u16 angle) {
+    return in_range(angle, 0, 0x7FFF);
 }
 
 void enqueue(Node** head, int val);

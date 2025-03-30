@@ -18,6 +18,7 @@
 #define GRIT_SQUINKY_H
 #include "squinky1.h"
 #include "squinky2.h"
+#include "squinky3.h"
 #include "squinky4.h"
 
 #define squinkyTilesLen 512

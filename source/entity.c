@@ -19,16 +19,15 @@ Entity* loadPlayer() {
         .health = 255,
         .position.x.HALF.HI = 64,
         .position.y.HALF.HI = 64,
-        .speed.HALF.HI = 1,
-        .dir = EAST,
+        .radius.WORD = 0x18000,
+        .speed.WORD = 0,
+        .angleOffset = 0xC000,
+        .angle = 0,
         .animationState = ANIM_IDLE,
-        .facing = EAST,
         .animFrames = 0,
         .obj = &obj_buffer[0],
         .obj_aff = &obj_aff_buffer[0],
         .moveSprite = movePlayerSpriteOnScreen,
-        .rotation = {0},
-        .facingLocked = 0,
         .hitbox =
         {
             .width = 15, .height = 12,
@@ -88,14 +87,13 @@ void spawnFella(Position pos) {
         fella->health = 120;
         fella->animationState = ANIM_IDLE;
         fella->ilk = ILK_FELLA;
-        fella->tid = 48;
+        fella->tid = 64;
         fella->pb = 1;
         fella->spriteShape = ATTR0_SQUARE;
         fella->spriteSize = ATTR1_SIZE_8;
         fella->spriteType = ATTR0_REG;
         fella->affIndex = 0;
         fella->moveSprite = moveSpriteOnScreen;
-        fella->facingLocked = 0;
         Hitbox hitbox = { .width = 8, .height = 8, .leftOffset = -4, .rightOffset = 3,
                           .topOffset = -4, .bottomOffset = 3, .xOffset = 0, .yOffset = 0 };
         fella->hitbox = hitbox;
@@ -122,7 +120,6 @@ void updateEnts() {
             if (onScreen) {
                 u8 prevAnimState = currEnt->animationState;
                 currEnt->obj->attr0 &= ~ATTR0_HIDE;
-                // currEnt->animationState = ANIM_IDLE;
                 Position offset = { {0}, {0} };
                 currEnt->moveSprite(currEnt, offset);
                 int crosshairEntColl = checkCrosshairEntColl(currEnt, crosshairWorldPos);
@@ -233,20 +230,23 @@ void updateAnimation(Entity* ent, u8 prevAnimState) {
             break;
         case ANIM_WALK:
             switch (frames) {
-                case 25:
+                case 32:
                     frames = 0;
                 case 0:
-                case 17:
                     ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
                     ent->obj->attr2 |= ATTR2_ID(0) | ATTR2_PALBANK(ent->pb);
                     break;
-                case 1:
+                case 8:
                     ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
                     ent->obj->attr2 |= ATTR2_ID(16) | ATTR2_PALBANK(ent->pb);
                     break;
-                case 9:
+                case 16:
                     ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
                     ent->obj->attr2 |= ATTR2_ID(32) | ATTR2_PALBANK(ent->pb);
+                    break;
+                case 24:
+                    ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
+                    ent->obj->attr2 |= ATTR2_ID(48) | ATTR2_PALBANK(ent->pb);
                     break;
                 default:
                     break;
@@ -287,13 +287,11 @@ bool checkPlayerEntCollision(Entity* player, Entity* ent) { // broad to narrow
 }
 
 void doPlayerKnockback(Entity* ent) {
-    entities->remoteControlCountdown = 4;
-    entities->invincibleTime = 61;
-    entities->facingLocked = 1;
-    if (entities->dir != STATIONARY) {
-        entities->dir = (entities->dir & DIAGONAL) | ((entities->dir + 2) % 4); // change to opposite direction
-    }
-    else entities->dir = ent->dir;
+    Entity* player = entities;
+    player->remoteControlCountdown = 4;
+    player->invincibleTime = 61;
+    player->angle = (player->angle + 0x8000) & 0xFFFF;
+    return;
 }
 
 int hBoxLOffset(Hitbox hb) {
