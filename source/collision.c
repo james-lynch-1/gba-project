@@ -19,8 +19,8 @@ u32 getPointCollision(Position pos, Scene* scene) {
 
 /** Returns a point along the edge of the hitbox in the given compass direction. */
 u32 getEdgePointCollision(Position pos, Hitbox hb, Direction dir, Scene* scene) {
-    pos.x.HALF.HI += lu_cos(dir) > 0 ? hBoxROffset(hb) : lu_cos(dir) == 0 ? 0 : hBoxLOffset(hb);
-    pos.y.HALF.HI += -lu_sin(dir) < 0 ? hBoxTOffset(hb) : -lu_sin(dir) == 0 ? 0 : hBoxBOffset(hb);
+    pos.x.HALF.HI += hb.xOffset + lu_cos(dir) > 0 ? hb.rightOffset : hb.leftOffset;
+    pos.y.HALF.HI += hb.yOffset + -lu_sin(dir) > 0 ? hb.bottomOffset : hb.topOffset;
     return getPointCollision(pos, scene);
 }
 

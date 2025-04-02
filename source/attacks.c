@@ -1,22 +1,13 @@
 #include "attacks.h"
 
-// crosshair-ent collision array indices
-// #define ATK_E_COLL   0
-// #define ATK_S_COLL   1
-// #define ATK_W_COLL   2
-// #define ATK_N_COLL   3
-// #define ATK_SE_COLL  4
-// #define ATK_SW_COLL  5
-// #define ATK_NW_COLL  6
-// #define ATK_NE_COLL  7
-// #define ATK_CTR_COLL 8
+// Range array: E, S, W, N, SE, SW, NW, NE, CTR
 
 const Attack basicAtk = {
     .range = {0, 0, 0, 0, 0, 0, 0, 0, 2},
     .class = 1,
     .anim = 0,
     .countdown = 20,
-    .duration = 20
+    .duration = 120
 };
 
 const Attack screenAtk = {
@@ -96,5 +87,5 @@ const Attack crossAtk = {
     .class = 1,
     .anim = 0,
     .countdown = 0,
-    .duration = 255
+    .duration = 512
 };

@@ -120,8 +120,8 @@ const typedef struct Attack_ {
     u8 range[MAX_ATK_RANGE]; // dmg values for each collision type (each type's index shown above)
     u8 class;
     u8 anim;
-    u16 countdown; // must not be greater than 255, because of UI nonsense
-    u16 duration; // must not be greater than 255, because of UI nonsense
+    u16 countdown; // must not be greater than 1023 (~17 seconds)
+    u16 duration; // must not be greater than 1023 (~17 seconds)
 } Attack;
 
 typedef struct AttackInstance_ {
