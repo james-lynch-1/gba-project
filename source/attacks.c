@@ -15,8 +15,8 @@ const Attack basicAtk = {
     .range = {0, 0, 0, 0, 0, 0, 0, 0, 2},
     .class = 1,
     .anim = 0,
-    .countdown = 60,
-    .duration = 255
+    .countdown = 20,
+    .duration = 20
 };
 
 const Attack screenAtk = {

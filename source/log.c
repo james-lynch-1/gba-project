@@ -69,13 +69,13 @@ void mgbaLog(Type type, void* messagePtr) {
         free(hex);
         break;
     case SPLITWORD: // basically prints two ints split by a dot
-        s16 shi = (*(union SplitWord*)messagePtr).HALF_U.HI;
-        s16 slo = (*(union SplitWord*)messagePtr).HALF_U.LO;
+        s16 shi = (*(SWord*)messagePtr).HALF_U.HI;
+        s16 slo = (*(SWord*)messagePtr).HALF_U.LO;
         length = sprintf(message, "signed SplitWord: %d.%hu", shi, slo);
         break;
     case USPLITWORD:
-        s16 uhi = (*(union SplitWord*)messagePtr).HALF_U.HI;
-        s16 ulo = (*(union SplitWord*)messagePtr).HALF_U.LO;
+        s16 uhi = (*(SWord*)messagePtr).HALF_U.HI;
+        s16 ulo = (*(SWord*)messagePtr).HALF_U.LO;
         length = sprintf(message, "unsigned SplitWord: %d.%d", uhi, ulo);
         break;
     }

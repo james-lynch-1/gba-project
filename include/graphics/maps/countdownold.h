@@ -3,12 +3,12 @@
 
 //======================================================================
 //
-//	countdown, 16x8@4, 
+//	countdown, 256x256@4, 
 //	+ palette 2 entries, not compressed
-//	+ 2 tiles not compressed
+//	+ 2 tiles (t|f|p reduced) not compressed
 //	Total size: 4 + 64 = 68
 //
-//	Time-stamp: 2025-03-31, 15:31:36
+//	Time-stamp: 2025-03-10, 23:53:50
 //	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
 //	( http://www.coranac.com/projects/#grit )
 //

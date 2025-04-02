@@ -12,8 +12,8 @@ extern Direction dPadDir;
 
 void handleInput() {
     Entity* player = entities;
-    union SplitWord radius = player->radius;
-    union SplitWord speed = player->speed;
+    SWord radius = player->radius;
+    SWord speed = player->speed;
     u8 prevAnimState = player->animationState;
     Hitbox hb = player->hitbox;
     key_poll();
@@ -33,8 +33,7 @@ void handleInput() {
     crosshairPos.x.HALF.HI += key_tri_horz();
     crosshairPos.y.HALF.HI += key_tri_vert();
     player->angle -= 0x300 * key_tri_shoulder();
-    speed.WORD -= 0x4000 * !key_is_down(KEY_A);
-    speed.WORD = clamp(speed.WORD + (0x8000 * key_is_down(KEY_A)), 0, radius.WORD);
+    speed.WORD = decaySpeed(speed, radius);
 
     // update affine stuff
     updateEntityAffine(player);
@@ -89,15 +88,15 @@ void handleInput() {
 
 Direction getDir(int direction[2], Direction dir) {
     switch ((direction[0] + 2) + 3 * (direction[1] + 2)) {
-        case 4:     return NORTHWEST;               ////////////
-        case 7:     return WEST;                  //     128    //
-        case 10:    return SOUTHWEST;            //192         64//
-        case 5:     return NORTH;               //                //
-        case 11:    return SOUTH;               //256    :)      0//512
-        case 6:     return NORTHEAST;           //                //
-        case 9:     return EAST;                 //320        448//
-        case 12:    return SOUTHEAST;             //     384    //
-        default:    return dir | STATIONARY;        ////////////
+        case 9:     return EAST;                    ////////////
+        case 6:     return NORTHEAST;             //   0x4000   //
+        case 5:     return NORTH;                //0x6000  0x2000//
+        case 4:     return NORTHWEST;           //                //
+        case 7:     return WEST;                //0x8000 :)      0//(0x10000)
+        case 10:    return SOUTHWEST;           //                //
+        case 11:    return SOUTH;                //0xA000  0xE000//
+        case 12:    return SOUTHEAST;             //   0xC000   //
+        default:    return STATIONARY;              ////////////
     }
 }
 
@@ -113,9 +112,7 @@ Position getNextPosition(Entity* player) {
 }
 
 void updateEntityAffine(Entity* player) {
-    u16 off = player->angleOffset;
     obj_aff_rotscale(player->obj_aff, 256, 256, player->angle + player->angleOffset);
-    mgbaLog(U16 VA off);
     obj_aff_copy(obj_aff_mem, player->obj_aff, 1);
 }
 
@@ -130,7 +127,6 @@ void dig(Entity* player, Scene* scene) {
 void updateAttacks() {
     // decrement attack timers and delete completed attacks
     AttackInstance* atk = entities->attacksActive;
-    // if the first one has timer == 0
     while (atk != NULL && atk->timer == 0) {
         entities->attacksActive = entities->attacksActive->next;
         free(atk);
@@ -155,34 +151,49 @@ void updateAttacks() {
 
 // checks for series of inputs resulting in a spin
 bool checkForSpin(Direction dir) {
-    static int anticlockwise;
+    static int difference = 0xC000;
     static int waitFrames = 0;
-    static int numOfSpinInputs = 0;
-    static Direction initDir = STATIONARY;
-    bool doSpin = false;
-    Direction cardinalDir = dir >> 14 << 14;
-    if (numOfSpinInputs == 8 || waitFrames == SPIN_WAIT_FRAMES) {
-        doSpin = numOfSpinInputs == 8;
-        anticlockwise = -1;
-        waitFrames = 0;
-        numOfSpinInputs = 0;
-        initDir = STATIONARY;
-        return doSpin;
+    static int numSpinputs = 0;
+    static Direction prevDir;
+    Direction cardinalDir = dir & 0xC000;
+    switch (numSpinputs) {
+        case NUM_SPINPUTS:
+            setSpin(&prevDir, cardinalDir, &waitFrames, 0, &numSpinputs, 0);
+            return true;
+        case 0:
+            prevDir = cardinalDir;
+            numSpinputs = 1;
+            return false;
+        case 1:
+            if (dir != STATIONARY) {
+                difference = 0xC000;
+                if (((cardinalDir - prevDir) & 0xFFFF) == 0x4000)
+                    difference = 0x4000;
+            }
+        default:
+            break;
     }
-    if (numOfSpinInputs == 0) {
-        initDir = cardinalDir;
-        numOfSpinInputs++;
+    if (waitFrames == SPIN_WAIT_FRAMES) {
+        setSpin(&prevDir, cardinalDir, &waitFrames, 0, &numSpinputs, 0);
         return false;
     }
-    if (numOfSpinInputs == 1 && (cardinalDir == ((initDir + 0x4000) & 0xFFFF))) anticlockwise = 1;
-    else if (numOfSpinInputs == 1 && (cardinalDir == ((initDir - 0x4000) & 0xFFFF))) anticlockwise = -1;
-    if (cardinalDir == ((initDir + anticlockwise * numOfSpinInputs * 0x4000) & 0xFFFF)) {
-        waitFrames = 0;
-        numOfSpinInputs++;
+    if (((prevDir + difference) & 0xFFFF) == (cardinalDir & 0xFFFF)) { // correct dir in sequence
+        setSpin(&prevDir, cardinalDir, &waitFrames, 0, &numSpinputs, ++numSpinputs);
         return false;
     }
-    waitFrames++;
+    if ((((prevDir + difference) & 0xFFFF) == (-cardinalDir & 0xFFFF)) || // handle incorrect dir
+        ((cardinalDir - prevDir) & 0xFFFF) == 0x8000) {
+        setSpin(&prevDir, cardinalDir, &waitFrames, 0, &numSpinputs, 1);
+        return false;
+    }
+    waitFrames++; // dir has not changed
     return false;
+}
+
+void setSpin(Direction* prevDir, Direction newDir, int* waitFrames, int newWF, int* numSpinputs, int newNS) {
+    *prevDir = newDir;
+    *waitFrames = newWF;
+    *numSpinputs = newNS;
 }
 
 void updatePlayerAnimation(Entity* player, u8 prevAnimState) {
@@ -196,11 +207,11 @@ void updatePlayerAnimation(Entity* player, u8 prevAnimState) {
     updateAnimation(player, prevAnimState);
 }
 
-int getNextDiffX(int x, union SplitWord speed, u32 angle) {
+int getNextDiffX(int x, SWord speed, u32 angle) {
     return ((((s64)(lu_cos(angle)) << 4) * speed.WORD) >> 16);
 }
 
-int getNextDiffY(int y, union SplitWord speed, u32 angle) {
+int getNextDiffY(int y, SWord speed, u32 angle) {
     return ((((s64)(-lu_sin(angle)) << 4) * speed.WORD) >> 16);
 }
 
@@ -218,37 +229,39 @@ u16 getAngle(Direction dir, u32 angle) {
     }
 }
 
-
 /** Finds closest possible position to the wall the ent is colliding with on the x axis. */
-union SplitWord handleCollisionX(Entity* ent) {
+SWord handleCollisionX(Entity* ent) {
     u32 angle = ent->angle;
-    union SplitWord speed = ent->speed, speedTest = { 0 };
+    SWord speed = ent->speed, speedTest = { 0 };
     Direction xDir = (EAST + !anglePositiveX(angle) * 0x8000) & 0xFFFF;
-    Position pos = ent->position;
-    Position posArr[2] = {pos, pos}; // nextPos, nextNextPos
+    Position pos = ent->position, posArr[2] = { pos, pos }; // nextPos, nextNextPos
     u32 coll = 0;
     do {
         posArr[0] = posArr[1];
         speedTest.WORD = clamp(speedTest.WORD + 0x10000, 0, speed.WORD + 1);
         posArr[1].x.WORD = pos.x.WORD + getNextDiffX(pos.x.WORD, speedTest, angle);
-        coll = getEdgeCollision(posArr[1], ent, xDir, scene);
+        coll = getEdgeCollision(posArr[1], ent->hitbox, xDir, scene);
     } while (coll == 0 && speedTest.WORD < speed.WORD);
     return posArr[coll == 0].x;
 }
 
 /** Finds closest possible position to the wall the ent is colliding with on the y axis. */
-union SplitWord handleCollisionY(Entity* ent) {
+SWord handleCollisionY(Entity* ent) {
     u32 angle = ent->angle;
-    union SplitWord speed = ent->speed, speedTest = { 0 };
+    SWord speed = ent->speed, speedTest = { 0 };
     Direction yDir = (NORTH + !anglePositiveY(angle) * 0x8000) & 0xFFFF;
-    Position pos = ent->position;
-    Position posArr[2] = {pos, pos}; // nextPos, nextNextPos
+    Position pos = ent->position, posArr[2] = { pos, pos }; // nextPos, nextNextPos
     u32 coll = 0;
     do {
         posArr[0] = posArr[1];
         speedTest.WORD = clamp(speedTest.WORD + 0x10000, 0, speed.WORD + 1);
         posArr[1].y.WORD = pos.y.WORD + getNextDiffY(pos.y.WORD, speedTest, angle);
-        coll = getEdgeCollision(posArr[1], ent, yDir, scene);
+        coll = getEdgeCollision(posArr[1], ent->hitbox, yDir, scene);
     } while (coll == 0 && speedTest.WORD < speed.WORD);
     return posArr[coll == 0].y;
+}
+
+inline int decaySpeed(SWord speed, SWord radius) {
+    speed.WORD -= 0x4000 * !key_is_down(KEY_A);
+    return clamp(speed.WORD + (0x8000 * key_is_down(KEY_A)), 0, radius.WORD);
 }

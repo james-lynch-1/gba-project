@@ -19,10 +19,9 @@ Entity* loadPlayer() {
         .health = 255,
         .position.x.HALF.HI = 64,
         .position.y.HALF.HI = 64,
-        .radius.WORD = 0x18000,
-        .speed.WORD = 0,
+        .radius.WORD = 0x1C000,
         .angleOffset = 0xC000,
-        .angle = 0,
+        .angle = 0x4000,
         .animationState = ANIM_IDLE,
         .animFrames = 0,
         .obj = &obj_buffer[0],
@@ -30,10 +29,10 @@ Entity* loadPlayer() {
         .moveSprite = movePlayerSpriteOnScreen,
         .hitbox =
         {
-            .width = 15, .height = 12,
+            .width = 15, .height = 15,
             .leftOffset = -7, .rightOffset = 7,
-            .topOffset = -6, .bottomOffset = 5,
-            .xOffset = 0, .yOffset = 4
+            .topOffset = -7, .bottomOffset = 7,
+            .xOffset = 0, .yOffset = 0
         },
         .spriteShape = ATTR0_SQUARE >> 12,
         .spriteSize = ATTR1_SIZE_32 >> 12,

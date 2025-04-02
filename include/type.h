@@ -21,7 +21,7 @@ typedef enum {
     USPLITWORD
 } Type;
 
-union SplitWord {
+typedef union SplitWord {
     s32 WORD;
     u32 WORD_U;
     struct {
@@ -33,9 +33,9 @@ union SplitWord {
     struct {
         u8 byte0, byte1, byte2, byte3;
     } BYTES;
-};
+} SWord;
 
-union SplitHWord {
+typedef union SplitHWord {
     s16 HWORD;
     u16 HWORD_U;
     struct {
@@ -49,7 +49,7 @@ union SplitHWord {
     struct {
         u8 byte1, byte2;
     } BYTES;
-};
+} SHWord;
 
 typedef struct Viewport_ {
     s16 x, xMin, xMax,
@@ -131,8 +131,8 @@ typedef struct AttackInstance_ {
 } AttackInstance;
 
 typedef struct Position_ {
-    union SplitWord x;
-    union SplitWord y;
+    SWord x;
+    SWord y;
 } Position;
 
 typedef struct Hitbox_ {
@@ -162,8 +162,8 @@ typedef struct Entity_ {
     Position position; // 8 bytes
     Hitbox hitbox; // 8 bytes
     AttackInstance* attacksActive; // 4 bytes
-    union SplitWord radius; // 4 bytes. Top speed
-    union SplitWord speed; // 4 bytes
+    SWord radius; // 4 bytes. Top speed
+    SWord speed; // 4 bytes. scalar value
     u16 angleOffset; // 2 bytes
     u16 angle; // 2 bytes
     u16 tid; // 2 bytes
@@ -189,11 +189,11 @@ typedef struct Node_ {
 } Node;
 
 /** Rounds a fixed point number (SplitWord) by adding 0x8000 and masking off the fractional bits */
-inline u32 sWRound(union SplitWord num) {
+inline u32 sWRound(SWord num) {
     return (num.WORD + 0x8000) & 0xFFFF0000u;
 }
 
-inline u16 sHWRound(union SplitWord num) {
+inline u16 sHWRound(SWord num) {
     return (num.WORD + 0x8000) >> 16;
 }
 

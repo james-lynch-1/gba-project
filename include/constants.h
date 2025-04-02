@@ -38,6 +38,7 @@
 #define CROSSHAIRS_Y_MAX    SCR_H - 16
 
 #define SPIN_WAIT_FRAMES    12
+#define NUM_SPINPUTS        9
 
 // crosshair-ent collision array indices
 #define ATK_E_COLL          0

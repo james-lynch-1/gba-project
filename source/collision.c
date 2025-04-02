@@ -19,22 +19,18 @@ u32 getPointCollision(Position pos, Scene* scene) {
 
 /** Returns a point along the edge of the hitbox in the given compass direction. */
 u32 getEdgePointCollision(Position pos, Hitbox hb, Direction dir, Scene* scene) {
-    int xOffArr[3] = { 0, hb.leftOffset, hb.rightOffset };
-    int yOffArr[3] = { 0, hb.topOffset, hb.bottomOffset };
-    int xOff = hb.xOffset + xOffArr[lu_cos(dir) < 0] + xOffArr[2 * (lu_cos(dir) > 0)];
-    int yOff = hb.yOffset + yOffArr[-lu_sin(dir) < 0] + yOffArr[2 * (-lu_sin(dir) > 0)];
-    pos.x.HALF.HI += xOff;
-    pos.y.HALF.HI += yOff;
+    pos.x.HALF.HI += lu_cos(dir) > 0 ? hBoxROffset(hb) : lu_cos(dir) == 0 ? 0 : hBoxLOffset(hb);
+    pos.y.HALF.HI += -lu_sin(dir) < 0 ? hBoxTOffset(hb) : -lu_sin(dir) == 0 ? 0 : hBoxBOffset(hb);
     return getPointCollision(pos, scene);
 }
 
 /** Only takes a cardinal direction. Returns collision for three points along a SINGLE side. */
-u32 getEdgeCollision(Position pos, Entity* ent, Direction cardDir, Scene* scene) {
+u32 getEdgeCollision(Position pos, Hitbox hb, Direction cardDir, Scene* scene) {
     u32 edgeCollision = 0;
     int yShiftOffset = 12 * (cardDir == NORTH || cardDir == SOUTH);
     Direction pointDir = (cardDir - 0x2000) & 0xFFFF;
     for (int i = 0; i < 3; i++) {
-        edgeCollision |= getEdgePointCollision(pos, ent->hitbox, pointDir, scene)
+        edgeCollision |= getEdgePointCollision(pos, hb, pointDir, scene)
             << (yShiftOffset + i * COLL_BITWIDTH);
         pointDir = (pointDir + 0x2000) & 0xFFFF;
     }

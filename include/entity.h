@@ -102,6 +102,6 @@ int hBoxYOffset(Hitbox hitbox);
 // collision
 u32 getPointCollision(Position pos, Scene* scene);
 u32 getEdgePointCollision(Position nextPos, Hitbox hb, Direction dir, Scene* scene);
-u32 getEdgeCollision(Position pos, Entity* ent, Direction cardDir, Scene* scene);
+u32 getEdgeCollision(Position pos, Hitbox hb, Direction cardDir, Scene* scene);
 
 #endif
