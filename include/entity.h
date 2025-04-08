@@ -70,6 +70,8 @@ typedef union __attribute__((packed)) CollisionTileRow1024x1024_ {
     u32 halfSBBRow[8];
 } CollisionTileRow1024x1024;
 
+extern u32 (* const getPointCollFns[])(Position pos, Scene* scene);
+
 // entities
 Entity* loadPlayer();
 Entity* loadEnt();
@@ -93,7 +95,9 @@ int hBoxXOffset(Hitbox hitbox);
 int hBoxYOffset(Hitbox hitbox);
 
 // collision
-u32 getPointCollision(Position pos, Scene* scene);
+u32 getPointCollision256x256(Position pos, Scene* scene);
+u32 getPointCollision512x512(Position pos, Scene* scene);
+u32 getPointCollision1024x1024(Position pos, Scene* scene);
 u32 getEdgePointCollision(Position nextPos, Hitbox hb, Direction dir, Scene* scene);
 u32 getEdgeCollision(Position pos, Hitbox hb, Direction cardDir, Scene* scene);
 
