@@ -70,7 +70,13 @@ typedef union __attribute__((packed)) CollisionTileRow1024x1024_ {
     u32 halfSBBRow[8];
 } CollisionTileRow1024x1024;
 
-extern u32 (* const getPointCollFns[])(Position pos, Scene* scene);
+typedef struct TileCollArray_ {
+    u16 row[16];
+} TileCollArray;
+
+extern u32(* const getPointCollFns[])(Position pos, Scene* scene);
+extern u32(* const handlePointCollFns[])(Position pos, u32 tileColl);
+extern TileCollArray TileCollArrays[16];
 
 // entities
 Entity* loadPlayer();
@@ -100,5 +106,9 @@ u32 getPointCollision512x512(Position pos, Scene* scene);
 u32 getPointCollision1024x1024(Position pos, Scene* scene);
 u32 getEdgePointCollision(Position nextPos, Hitbox hb, Direction dir, Scene* scene);
 u32 getEdgeCollision(Position pos, Hitbox hb, Direction cardDir, Scene* scene);
+
+u32 getInTilePointColl(Position pos, u32 tileColl);
+u32 handleItemTileColl(Position pos, u32 tileColl);
+u32 handleActionTileColl(Position pos, u32 tileColl);
 
 #endif

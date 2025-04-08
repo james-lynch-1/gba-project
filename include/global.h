@@ -14,5 +14,6 @@
 #include "log.h"
 #include "ui.h"
 #include "attacks.h"
+#include "tile.h"
 
 #endif

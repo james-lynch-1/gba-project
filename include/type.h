@@ -203,6 +203,19 @@ typedef struct Entity_ {
     u8 objectMode; // 1 byte, needs to be shifted left by ATTR0_MODE_SHIFT (8) to be used in OAM
 } Entity;
 
+typedef struct ActionTile_ {
+    u16 tileX;
+    u16 tileY;
+    s16 respawnTime; // for items
+    u8 TileClass; // index into fp array
+} ActionTile;
+
+typedef struct ActionTileNode_ {
+    struct ActionTileNode_* next;
+    ActionTile* data;
+    s16 timer;
+} ActionTileNode;
+
 typedef struct Node_ {
     int val;
     struct Node_* next;
