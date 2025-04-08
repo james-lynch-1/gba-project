@@ -9,13 +9,11 @@ Scene* scene;
 Viewport vp = {0, 0, 0, 0, 0, 0};
 Direction dPadDir = EAST;
 int numEnts = 0;
-int numAttacks = 0;
+int numAttacks = 0; // not including basic attack
 Position crosshairPos = {.x.WORD = 8 << 16, .y.WORD = 8 << 16};
 
 int main() {
 	initialise();
-	entities = loadPlayer();
-	scene = loadSceneInitial(Grassland);
 	while (1) {
 		VBlankIntrWait();
 		handleInput();
@@ -24,7 +22,7 @@ int main() {
 		updateEnts();
 		updateCrosshair();
 
-		oam_copy(oam_mem, obj_buffer, MAX_ENTS);
+		oam_copy(oam_mem, obj_buffer, 128);
 		frameCount++;
 	}
 

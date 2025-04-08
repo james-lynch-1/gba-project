@@ -11,6 +11,7 @@ typedef enum {
     PTR,
     INT,
     INTHEX,
+    U8,
     S16,
     S32,
     U16,
@@ -20,6 +21,18 @@ typedef enum {
     SPLITWORD,
     USPLITWORD
 } Type;
+
+enum AtkClass {
+    DIRECT = 0, // fired by holding the attack button
+    SPECIAL = 1 // fired by triggering some other way, has a fixed countdown and duration that cannot be interrupted
+};
+
+enum AtkId {
+    BASICATK, SCREENATK,
+    EATK, SATK, WATK, NATK,
+    SEATK, SWATK, NWATK, NEATK,
+    CATK
+};
 
 typedef union SplitWord {
     s32 WORD;
@@ -112,22 +125,28 @@ typedef struct Scene_ {
     s16 screenX;
     s16 screenY;
     u8 numEnts;
+
     u16 tid : 9;
     u16 pb : 4;
 } Scene;
 
 const typedef struct Attack_ {
-    u8 range[MAX_ATK_RANGE]; // dmg values for each collision type (each type's index shown above)
-    u8 class;
-    u8 anim;
     u16 countdown; // must not be greater than 1023 (~17 seconds)
     u16 duration; // must not be greater than 1023 (~17 seconds)
+    u16 cooldown;
+    u8 range[MAX_ATK_RANGE]; // dmg values for each collision type (each type's index shown above)
+    u8 atkClass;
+    u8 anim;
+    u8 id;
 } Attack;
 
 typedef struct AttackInstance_ {
     struct AttackInstance_* next;
     Attack* attack;
-    int timer; // always initialised to countdown + duration
+    s16 timer; // always initialised to countdown + duration
+    s16 cooldownTimer;
+    u8 firing;
+    u8 toBeDeleted;
 } AttackInstance;
 
 typedef struct Position_ {
@@ -150,7 +169,6 @@ typedef struct Entity_ {
     // linked list
     struct Entity_* prev; // 4 bytes
     struct Entity_* next; // 4 bytes
-    bool toBeDeleted; // 4 bytes
 
     // shadow OAM entries
     OBJ_ATTR* obj; // 4 bytes
@@ -171,16 +189,18 @@ typedef struct Entity_ {
     u8 affIndex; // 1 byte
     u8 ilk; // 1 byte
     u8 invincibleTime; // 1 byte
+    u8 toBeDeleted; // 1 byte
 
     // visual
     u8 pb; // 1 byte
     u8 animationState; // 1 byte
     u8 animFrames; // 1 byte. how many frames ent has been in current animation state
+    u8 numSprites; // 1 byte. how many sprites this entity has
     u8 width; // 1 byte
     u8 height; // 1 byte
     u8 spriteShape; // 1 byte, needs to be shifted left by 12 to be used in OAM
     u8 spriteSize; // 1 byte, needs to be shifted left by 12 to be used in OAM
-    u8 spriteType; // 1 byte, needs to be shifted left by ATTR0_MODE_SHIFT (8) to be used in OAM
+    u8 objectMode; // 1 byte, needs to be shifted left by ATTR0_MODE_SHIFT (8) to be used in OAM
 } Entity;
 
 typedef struct Node_ {

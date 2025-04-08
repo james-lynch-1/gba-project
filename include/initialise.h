@@ -6,7 +6,7 @@
 #include "scene.h"
 
 void initialise();
-void loadCrosshairs();
+void loadUI();
 void loadSprites();
 Scene* loadSceneInitial(SceneEnum sceneName);
 

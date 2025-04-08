@@ -5,5 +5,6 @@
 
 #include "graphics/maps/crosshairs.h"
 #include "graphics/maps/countdown.h"
+#include "graphics/sprites/basicCountdown.h"
 #include "graphics/sprites/squinky.h"
 #include "graphics/sprites/debugBlob.h"

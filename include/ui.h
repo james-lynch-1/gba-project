@@ -6,7 +6,11 @@
 #include "constants.h"
 #include <tonc.h>
 
-void updateQuadCountdownUI(int timer, int countdown, int duration, int atkNum);
+extern void (* const updateUiFns[])(AttackInstance* atkInst, int atkNum);
+
+void updateQuadCountdownUI(AttackInstance* atkInst, int atkIndex);
+
+void updateBasicAttackUI(AttackInstance* atkInst, int atkIndex);
 
 void updateCrosshair();
 

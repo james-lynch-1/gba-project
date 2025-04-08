@@ -1,6 +1,11 @@
 #ifndef constantsh
 #define constantsh
 
+// animation state
+#define ANIM_IDLE           0
+#define ANIM_HURT           1
+#define ANIM_WALK           2
+
 // maximums (will change)
 #define PLAYER_MAX_RADIUS   0x30000
 #define MAX_ENTS            16

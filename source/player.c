@@ -60,9 +60,10 @@ void handleInput() {
             default: pushNewAttack(&crossAtk); break;
         }
     }
+    player->attacksActive->firing = key_is_down(KEY_B);
 
     bool isSpinning = checkForSpin(dPadDir);
-    if (isSpinning) pushNewAttack(&basicAtk);
+    if (isSpinning) pushNewAttack(&crossAtk);
     crosshairPos.x.WORD = clamp(crosshairPos.x.WORD, CROSSHAIRS_X_MIN << 16, (CROSSHAIRS_X_MAX) << 16);
     crosshairPos.y.WORD = clamp(crosshairPos.y.WORD, CROSSHAIRS_Y_MIN << 16, (CROSSHAIRS_Y_MAX) << 16);
 
@@ -126,27 +127,28 @@ void dig(Entity* player, Scene* scene) {
 
 void updateAttacks() {
     // decrement attack timers and delete completed attacks
-    AttackInstance* atk = entities->attacksActive;
-    while (atk != NULL && atk->timer == 0) {
-        entities->attacksActive = entities->attacksActive->next;
-        free(atk);
-        numAttacks--;
-        atk = entities->attacksActive;
-    }
+    AttackInstance* atkInst = entities->attacksActive;
+    // while (atkInst != NULL && atkInst->toBeDeleted) {
+    //     entities->attacksActive = entities->attacksActive->next;
+    //     free(atkInst);
+    //     numAttacks--;
+    //     atkInst = entities->attacksActive;
+    // }
     // now assuming the first one has non-zero timer
     int atkIndex = 0;
-    while (atk != NULL) {
-        if (atk->next && atk->next->timer == 0) { // checking/deleting the next one cos no prev pointer
-            AttackInstance* newNext = atk->next->next;
-            deleteNextAtkInstance(atk);
+    while (atkInst != NULL) {
+        if (atkInst->next && atkInst->next->toBeDeleted) { // checking/deleting the next one cos no prev pointer
+            AttackInstance* newNext = atkInst->next->next;
+            deleteNextAtkInstance(atkInst);
             numAttacks--;
-            atk->next = newNext;
+            atkInst->next = newNext;
         }
-        updateQuadCountdownUI(atk->timer, atk->attack->countdown, atk->attack->duration, atkIndex);
+        updateUiFns[atkInst->attack->atkClass](atkInst, atkIndex);
         atkIndex++;
-        atk->timer--;
-        atk = atk->next;
+        atkUpdateFns[atkInst->attack->atkClass](atkInst);
+        atkInst = atkInst->next;
     }
+    entities->attacksActive->toBeDeleted = 0; // can't delete the first attack
 }
 
 // checks for series of inputs resulting in a spin

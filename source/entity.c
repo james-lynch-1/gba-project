@@ -24,27 +24,22 @@ Entity* loadPlayer() {
         .angle = 0x4000,
         .animationState = ANIM_IDLE,
         .animFrames = 0,
-        .obj = &obj_buffer[0],
+        .attacksActive = NULL,
+        .obj = &obj_buffer[1],
         .obj_aff = &obj_aff_buffer[0],
         .moveSprite = movePlayerSpriteOnScreen,
-        .hitbox =
-        {
-            .width = 15, .height = 15,
-            .leftOffset = -7, .rightOffset = 7,
-            .topOffset = -7, .bottomOffset = 7,
-            .xOffset = 0, .yOffset = 0
-        },
+        .hitbox = playerHitbox,
         .spriteShape = ATTR0_SQUARE >> 12,
         .spriteSize = ATTR1_SIZE_32 >> 12,
-        .spriteType = ATTR0_AFF >> ATTR0_MODE_SHIFT,
+        .objectMode = ATTR0_AFF >> ATTR0_MODE_SHIFT,
         .affIndex = ATTR1_AFF_ID(0),
         .tid = 0,
         .pb = 0,
-        .ilk = ILK_PLAYER,
+        .ilk = PLAYER,
     };
     *entities = player;
     obj_set_attr(entities->obj,
-        entities->spriteShape << 12 | entities->spriteType << ATTR0_MODE_SHIFT,
+        entities->spriteShape << 12 | entities->objectMode << ATTR0_MODE_SHIFT,
         entities->spriteSize << 12 | entities->affIndex,
         ATTR2_PRIO(3) | ATTR2_PALBANK(entities->pb) | entities->tid);
     numEnts++;
@@ -69,7 +64,7 @@ Entity* loadEnt() {
     {
         .prev = prevEnt,
         .next = NULL,
-        .obj = &obj_buffer[numEnts],
+        .obj = &obj_buffer[numEnts + 1],
         .obj_aff = NULL
     };
     *currEnt = newEnt;
@@ -85,17 +80,15 @@ void spawnFella(Position pos) {
         fella->height = 8;
         fella->health = 120;
         fella->animationState = ANIM_IDLE;
-        fella->ilk = ILK_FELLA;
+        fella->ilk = FELLA;
         fella->tid = 64;
         fella->pb = 1;
         fella->spriteShape = ATTR0_SQUARE;
         fella->spriteSize = ATTR1_SIZE_8;
-        fella->spriteType = ATTR0_REG;
+        fella->objectMode = ATTR0_REG;
         fella->affIndex = 0;
         fella->moveSprite = moveSpriteOnScreen;
-        Hitbox hitbox = { .width = 8, .height = 8, .leftOffset = -4, .rightOffset = 3,
-                          .topOffset = -4, .bottomOffset = 3, .xOffset = 0, .yOffset = 0 };
-        fella->hitbox = hitbox;
+        fella->hitbox = fellaHitbox;
         obj_set_attr(fella->obj,
             fella->spriteShape | ATTR0_REG,
             fella->spriteSize,
@@ -130,10 +123,18 @@ void updateEnts() {
             }
             else currEnt->obj->attr0 |= ATTR0_HIDE;
             if (currEnt->health <= 0) {
-                currEnt->toBeDeleted = true;
+                currEnt->toBeDeleted = 1;
             }
             currEnt = next;
         }
+    }
+}
+
+void markAllEntsToBeDeleted() {
+    Entity* ent = entities->next;
+    while (ent) {
+        ent->toBeDeleted = 1;
+        ent = ent->next;
     }
 }
 
@@ -143,30 +144,6 @@ void deleteEnt(Entity* ent) {
     if (ent->next) (ent->next)->prev = ent->prev;
     free(ent);
     numEnts--;
-}
-
-void deleteNextAtkInstance(AttackInstance* atkInst) {
-    AttackInstance* toBeDeleted = atkInst->next;
-    free(toBeDeleted);
-}
-
-void pushNewAttack(Attack* atk) {
-    if (numAttacks < 4) {
-        AttackInstance* atkInstPtr = malloc(sizeof(AttackInstance));
-        AttackInstance atkInst = {
-            .next = NULL,
-            .attack = atk,
-            .timer = atk->countdown + atk->duration
-        };
-        *atkInstPtr = atkInst;
-        AttackInstance* slot = entities->attacksActive;
-        while (slot != NULL && slot->next != NULL) {
-            slot = slot->next;
-        }
-        if (slot == NULL) entities->attacksActive = atkInstPtr;
-        else slot->next = atkInstPtr;
-        numAttacks++;
-    }
 }
 
 /** returns crosshair-ent collision
@@ -195,22 +172,6 @@ u32 checkCrosshairEntColl(Entity* ent, Position crosshairWorldPos) {
         case 15: return ATK_CTR_COLL;
         default: return 0;
     }
-}
-
-void handlePlayerAttacks(Entity* ent, int crosshairEntColl) {
-    ent->animationState = ANIM_IDLE;
-    Entity player = *entities;
-    AttackInstance* atkInst = player.attacksActive;
-    while (atkInst != NULL) {
-        if (atkInst->attack->range[crosshairEntColl] != 0 && atkInst->timer <= atkInst->attack->duration)
-            doAttack(ent, atkInst->attack->range[crosshairEntColl]);
-        atkInst = atkInst->next;
-    }
-}
-
-void doAttack(Entity* ent, u8 attackRangeValue) {
-    ent->animationState = ANIM_HURT;
-    ent->health -= attackRangeValue;
 }
 
 void updateAnimation(Entity* ent, u8 prevAnimState) {

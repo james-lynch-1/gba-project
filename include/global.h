@@ -6,6 +6,8 @@
 #include <string.h>
 #include <tonc.h>
 #include "entity.h"
+#include "type.h"
+#include "hitbox.h"
 #include "player.h"
 #include "graphics/graphics.h"
 #include "initialise.h"

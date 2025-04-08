@@ -9,6 +9,7 @@
 #include "ui.h"
 #include "attacks.h"
 #include "stdlib.h"
+#include "hitbox.h"
 
 // collision direction masks to get direction from a collision bitfield
 
@@ -27,14 +28,9 @@
 #define CORNER_COLL_MASK    0x00F0FF0Fu
 #define COLL_MASK        0xFFFFFFFFu
 
-// animation state
-#define ANIM_IDLE           0
-#define ANIM_HURT           1
-#define ANIM_WALK           2
-
 // ilks
-#define ILK_PLAYER  0
-#define ILK_FELLA   1
+#define PLAYER  0
+#define FELLA   1
 
 /** Collision data for 16 metatiles (1 SBB row / 1 32 tile-wide map) packed into two words.
 4 bits/tile -> 16 possible collision types per tile */
@@ -79,14 +75,11 @@ Entity* loadPlayer();
 Entity* loadEnt();
 void spawnFella(Position pos);
 void updateEnts();
+void markAllEntsToBeDeleted();
 void deleteEnt(Entity* ent);
 
 // attacks
-void deleteNextAtkInstance(AttackInstance* atkInst);
-void pushNewAttack(Attack* atk);
 u32 checkCrosshairEntColl(Entity* ent, Position crosshairWorldPos);
-void handlePlayerAttacks(Entity* ent, int crosshairEntColl);
-void doAttack(Entity* ent, u8 attackRangeValue);
 void updateAnimation(Entity* ent, u8 prevAnimState);
 bool checkPlayerEntCollision(Entity* player, Entity* currEnt);
 void doPlayerKnockback(Entity* ent);

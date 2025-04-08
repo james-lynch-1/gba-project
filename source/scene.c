@@ -37,12 +37,12 @@ void loadScene(Scene* scene, SceneEnum sceneName) {
     scene->screenY = vp.y;
     updateBGTiles(scene);
 
-    Entity* ent = entities->next;
-    while (ent != NULL) {
-        ent->toBeDeleted = true;
-        ent = ent->next;
-    }
+    mgbaLog(CHAR VA "pre-deletion: ");
+    mgbaLog(U16 VA numEnts);
+    markAllEntsToBeDeleted();
     scene->numEnts = numEnts;
+    mgbaLog(CHAR VA "post-deletion: ");
+    mgbaLog(U16 VA numEnts);
 
     scene->tid = 0;
     scene->pb = 0;
