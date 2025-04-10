@@ -1,7 +1,12 @@
 
-#include "entity.h"
-#include <tonc.h>
+#include "type.h"
+#include "tile.h"
 #include "log.h"
+#include "graphics/maps/grassland.h"
+#include "attacks.h"
+
+extern Entity* entities;
+extern Scene* scene;
 
 TileCollArray TileCollArrays[16] = {
     {}, // empty
@@ -202,8 +207,22 @@ u32 handleItemTileColl(Position pos, u32 tileColl) {
     return 0;
 }
 
+void doAction(int actionTileId) { // we are testing the ability to use mtile coords as id for action
+    TreeNode* node = scene->actionTileTree;
+    bool found = false;
+    while (node && !found) { // search through the tree for actionTileId
+        node = actionTileId < (int)node->data ? node->left : node->right;
+        found = actionTileId == (int)node->data;
+    }
+    if (!node) return;
+    ActionTile* tile = (ActionTile*)node->data;
+    pushNewAttack(atks[tile->data.TileClass]);
+}
+
 u32 handleActionTileColl(Position pos, u32 tileColl) {
-    return 1;
+    int mTile = coordToMetatile(pos, scene);
+    doAction(mTile);
+    return 0;
 }
 
 u32(* const getPointCollFns[])(Position pos, Scene* scene) = {

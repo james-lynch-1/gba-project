@@ -18,7 +18,9 @@
 #ifndef GRIT_GRASSLAND_H
 #define GRIT_GRASSLAND_H
 
-#include "entity.h"
+#include "type.h"
+
+extern ActionTile GrasslandActionTiles[];
 
 #define grasslandTilesLen 544
 extern const unsigned short grasslandTiles[272];

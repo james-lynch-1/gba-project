@@ -11,38 +11,36 @@ const struct SceneData sceneDataArr[NUM_SCENES] = { {
     .sceneId = Grassland,
     .sourceMap = grasslandMap,
     .collisionMap = grasslandColl,
+    .actionTileArray = GrasslandActionTiles,
     .mapWInMtiles = 32,
-    .mapHInMTiles = 32
+    .mapHInMtiles = 32
 }, {
     .sceneId = Home,
     .sourceMap = homeMap,
     .collisionMap = homeColl,
     .mapWInMtiles = 16,
-    .mapHInMTiles = 16
+    .mapHInMtiles = 16
 }, {
     .sceneId = Uglybig,
     .sourceMap = uglybigMap,
     .collisionMap = uglybigColl,
     .mapWInMtiles = 64,
-    .mapHInMTiles = 64
+    .mapHInMtiles = 64
 } };
 
 void loadScene(Scene* scene, SceneEnum sceneName) {
     scene->sceneData = sceneDataArr[sceneName];
+    scene->actionTileTree = generateActionTileTree(scene->sceneData.actionTileArray);
 
     vp.xMax = scene->sceneData.mapWInMtiles * 16 - SCR_W;
-    vp.yMax = scene->sceneData.mapHInMTiles * 16 - SCR_H;
+    vp.yMax = scene->sceneData.mapHInMtiles * 16 - SCR_H;
     moveViewportOnMap(entities, scene);
     scene->screenX = vp.x;
     scene->screenY = vp.y;
     updateBGTiles(scene);
 
-    mgbaLog(CHAR VA "pre-deletion: ");
-    mgbaLog(U16 VA numEnts);
     markAllEntsToBeDeleted();
     scene->numEnts = numEnts;
-    mgbaLog(CHAR VA "post-deletion: ");
-    mgbaLog(U16 VA numEnts);
 
     scene->tid = 0;
     scene->pb = 0;

@@ -203,3 +203,9 @@ const Attack crossAtk = {
     .cooldown = 240,
     .id = CATK
 };
+
+Attack* atks[] = {
+    &basicAtk, &screenAtk, &eastAtk, &southAtk,
+    &westAtk, &northAtk, &southeastAtk, &southwestAtk,
+    &northwestAtk, &northeastAtk, &crossAtk
+};

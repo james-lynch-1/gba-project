@@ -4,6 +4,7 @@
 #include "type.h"
 #include "constants.h"
 #include "scene.h"
+#include "avl.h"
 
 typedef struct MtTileArray_ {
     u16 t0; u16 t1;
@@ -21,7 +22,6 @@ enum TileClass {
     T_3_8_W_FILLED = 7,
     T_3_8_S_FILLED = 8, // 3/8ths filled, on the south side
     T_3_8_N_FILLED = 9,
-    T_ITEM = 14,
     T_ACTION = 15
 };
 
@@ -31,6 +31,8 @@ u32 coordToMtSeIndex(Position pos, Scene* scene);
 u32 metatileToSeIndex(int metatile, Scene* scene);
 u32 coordToSeIndex(Position pos, Scene* scene);
 
-void updateDynamicTiles();
+TreeNode* generateActionTileTree(const ActionTile* tileArray);
+void applyActionTileTreeToCollMap(Scene* scene);
+void addActionTileToCollMap(Scene* scene, TreeNode* actionTileNode);
 
 #endif

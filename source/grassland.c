@@ -59,7 +59,7 @@ const unsigned short grasslandTiles[272] __attribute__((aligned(4))) =
 	0x7777,0x7777,0x7777,0x7777,0x7444,0x4777,0x4444,0x4444,
 };
 
-const unsigned short grasslandMap[4096] __attribute__((aligned(4)))=
+const unsigned short grasslandMap[4096] __attribute__((aligned(4))) =
 {
 	0x0001,0x0002,0x0003,0x0003,0x0001,0x0002,0x0001,0x0002,
 	0x0001,0x0002,0x0001,0x0002,0x0001,0x0002,0x0003,0x0003,
@@ -678,6 +678,14 @@ CollisionTileRow512x512 grasslandColl[32] __attribute__((aligned(4))) =
 	{.row = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}},
 	{.row = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}},
 	{.row = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}}
+};
+
+ActionTile GrasslandActionTiles[] = {
+	{103, {60, ITEM_CROSSATK}},
+	{107, {60, ITEM_CROSSATK}},
+	{144, {60, ITEM_CROSSATK}},
+	{100, {60, ITEM_CROSSATK}},
+	{-1}
 };
 
 //}}BLOCK(grassland)

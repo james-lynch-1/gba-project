@@ -82,7 +82,7 @@ void handleInput() {
     }
     if (nextId != NUM_SCENES) {
         player->position.y.HALF.HI = clamp(player->position.y.HALF.HI, hBoxTOffset(hb),
-            sceneDataArr[nextId].mapHInMTiles * MT_WIDTH - hBoxBOffset(hb) - 2);
+            sceneDataArr[nextId].mapHInMtiles * MT_WIDTH - hBoxBOffset(hb) - 2);
         loadScene(scene, nextId);
     }
 }
@@ -108,7 +108,7 @@ Position getNextPosition(Entity* player) {
         .y = handleCollisionY(player)
     };
     nextPos.y.HALF.HI = clamp(nextPos.y.HALF.HI, hBoxTOffset(player->hitbox) + 4,
-        scene->sceneData.mapHInMTiles * MT_WIDTH - hBoxBOffset(player->hitbox) - 1);
+        scene->sceneData.mapHInMtiles * MT_WIDTH - hBoxBOffset(player->hitbox) - 1);
     return nextPos;
 }
 

@@ -1,34 +1,32 @@
 #include "type.h"
 
-void enqueue(Node** head, int val) {
-    Node* new_node = malloc(sizeof(Node));
-    if (!new_node) return;
-
-    new_node->val = val;
-    new_node->next = *head;
-
-    *head = new_node;
+// stack functions
+Node* createStack(void* data) {
+    Node* headPtr = malloc(sizeof(Node));
+    Node head = {data, NULL};
+    *headPtr = head;
+    return headPtr;
 }
 
-int dequeue(Node** head) {
-    Node *current, *prev = NULL;
-    int retval = -1;
+Node* push(Node* node, void* data) {
+    if (!data) return node;
+    Node* newNodePtr = malloc(sizeof(Node));
+    if (!newNodePtr) return NULL;
+    Node newNode = { data, node };
+    *newNodePtr = newNode;
+    return newNodePtr;
+}
 
-    if (*head == NULL) return -1;
+Node* pop(Node* node) {
+    if (!node) return NULL;
+    Node* nextNode = node->next;
+    free(node);
+    return nextNode;
+}
 
-    current = *head;
-    while (current->next != NULL) {
-        prev = current;
-        current = current->next;
+void deleteStack(Node* node) {
+    while (node) {
+        node = pop(node);
     }
-
-    retval = current->val;
-    free(current);
-
-    if (prev)
-        prev->next = NULL;
-    else
-        *head = NULL;
-
-    return retval;
+    return;
 }

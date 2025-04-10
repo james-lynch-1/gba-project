@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "constants.h"
 #include "type.h"
+#include "tile.h"
 
 const extern struct SceneData sceneDataArr[NUM_SCENES];
 

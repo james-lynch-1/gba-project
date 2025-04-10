@@ -22,6 +22,8 @@ extern void (* const beAtkdFns[])(Entity* ent, u8 attackRangeValue);
 
 extern void (* const atkUpdateFns[])(AttackInstance* atkInst);
 
+extern Attack* atks[];
+
 void deleteNextAtkInstance(AttackInstance* atkInst);
 AttackInstance* createAttack(Attack* atk);
 void pushNewAttack(Attack* atk);

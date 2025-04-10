@@ -5,6 +5,23 @@
 #include <stdlib.h>
 #include "constants.h"
 
+// collision direction masks to get direction from a collision bitfield
+
+#define X_CNTR_COLL_MASK    0x000000F0u
+#define Y_CNTR_COLL_MASK    0x000F0000u
+#define X_COLL_MASK         0x00000FFFu
+#define Y_COLL_MASK         0x00FFF000u
+#define X_CRNR_COLL_MASK    0x00000F0Fu
+#define Y_CRNR_COLL_MASK    0x00F0F000u
+#define X_CRNR_COLL_1_MASK  0x0000000Fu
+#define X_CRNR_COLL_2_MASK  0x00000F00u
+#define Y_CRNR_COLL_1_MASK  0x0000F000u
+#define Y_CRNR_COLL_2_MASK  0x00F00000u
+
+#define PACKED_COLLMAP_MASK 0x0000000Fu
+#define CORNER_COLL_MASK    0x00F0FF0Fu
+#define COLL_MASK           0xFFFFFFFFu
+
 typedef enum {
     CHAR,
     DIRECTION,
@@ -22,6 +39,26 @@ typedef enum {
     USPLITWORD
 } Type;
 
+enum ItemClass { // corresponds with atk array in attacks.c
+    ITEM_BASICATK,
+    ITEM_SCREENATK,
+    ITEM_EASTATK,
+    ITEM_SOUTHATK,
+    ITEM_WESTATK,
+    ITEM_NORTHATK,
+    ITEM_SOUTHEASTATK,
+    ITEM_SOUTHWESTATK,
+    ITEM_NORTHWESTATK,
+    ITEM_NORTHEASTATK,
+    ITEM_CROSSATK
+};
+
+#define NUM_ITEMS   11
+
+enum ActionClass {
+    ACTION_ADD_ITEM,
+};
+
 enum AtkClass {
     DIRECT = 0, // fired by holding the attack button
     SPECIAL = 1 // fired by triggering some other way, has a fixed countdown and duration that cannot be interrupted
@@ -33,6 +70,48 @@ enum AtkId {
     SEATK, SWATK, NWATK, NEATK,
     CATK
 };
+
+/** Collision data for 16 metatiles (1 SBB row / 1 32 tile-wide map) packed into two words.
+4 bits/tile -> 16 possible collision types per tile */
+typedef union __attribute__((packed)) CollisionTileRow256x256_ {
+    struct row {
+        u8 t0 : 4; u8 t1 : 4; u8 t2 : 4; u8 t3 : 4; u8 t4 : 4; u8 t5 : 4; u8 t6 : 4; u8 t7 : 4;
+        u8 t8 : 4; u8 t9 : 4; u8 t10 : 4; u8 t11 : 4; u8 t12 : 4; u8 t13 : 4; u8 t14 : 4; u8 t15 : 4;
+    } row;
+    u32 halfSBBRow[2];
+} CollisionTileRow256x256;
+
+/** Collision data for 32 metatiles (2 SBB rows / 1 64 tile-wide map) packed into four words.
+4 bits/tile -> 16 possible collision types per tile */
+typedef union __attribute__((packed)) CollisionTileRow512x512_ {
+    struct rowDbl {
+        u8 t0 : 4; u8 t1 : 4; u8 t2 : 4; u8 t3 : 4; u8 t4 : 4; u8 t5 : 4; u8 t6 : 4; u8 t7 : 4;
+        u8 t8 : 4; u8 t9 : 4; u8 t10 : 4; u8 t11 : 4; u8 t12 : 4; u8 t13 : 4; u8 t14 : 4; u8 t15 : 4;
+        u8 t16 : 4; u8 t17 : 4; u8 t18 : 4; u8 t19 : 4; u8 t20 : 4; u8 t21 : 4; u8 t22 : 4; u8 t23 : 4;
+        u8 t24 : 4; u8 t25 : 4; u8 t26 : 4; u8 t27 : 4; u8 t28 : 4; u8 t29 : 4; u8 t30 : 4; u8 t31 : 4;
+    } row;
+    u32 halfSBBRow[4];
+} CollisionTileRow512x512;
+
+/** Collision data for 64 metatiles (4 SBB rows / 1 128 tile-wide map) packed into eight words.
+4 bits/tile -> 16 possible collision types per tile */
+typedef union __attribute__((packed)) CollisionTileRow1024x1024_ {
+    struct rowQdrpl {
+        u8 t0 : 4; u8 t1 : 4; u8 t2 : 4; u8 t3 : 4; u8 t4 : 4; u8 t5 : 4; u8 t6 : 4; u8 t7 : 4;
+        u8 t8 : 4; u8 t9 : 4; u8 t10 : 4; u8 t11 : 4; u8 t12 : 4; u8 t13 : 4; u8 t14 : 4; u8 t15 : 4;
+        u8 t16 : 4; u8 t17 : 4; u8 t18 : 4; u8 t19 : 4; u8 t20 : 4; u8 t21 : 4; u8 t22 : 4; u8 t23 : 4;
+        u8 t24 : 4; u8 t25 : 4; u8 t26 : 4; u8 t27 : 4; u8 t28 : 4; u8 t29 : 4; u8 t30 : 4; u8 t31 : 4;
+        u8 t32 : 4; u8 t33 : 4; u8 t34 : 4; u8 t35 : 4; u8 t36 : 4; u8 t37 : 4; u8 t38 : 4; u8 t39 : 4;
+        u8 t40 : 4; u8 t41 : 4; u8 t42 : 4; u8 t43 : 4; u8 t44 : 4; u8 t45 : 4; u8 t46 : 4; u8 t47 : 4;
+        u8 t48 : 4; u8 t49 : 4; u8 t50 : 4; u8 t51 : 4; u8 t52 : 4; u8 t53 : 4; u8 t54 : 4; u8 t55 : 4;
+        u8 t56 : 4; u8 t57 : 4; u8 t58 : 4; u8 t59 : 4; u8 t60 : 4; u8 t61 : 4; u8 t62 : 4; u8 t63 : 4;
+    } row;
+    u32 halfSBBRow[8];
+} CollisionTileRow1024x1024;
+
+typedef struct TileCollArray_ {
+    u16 row[16];
+} TileCollArray;
 
 typedef union SplitWord {
     s32 WORD;
@@ -63,6 +142,14 @@ typedef union SplitHWord {
         u8 byte1, byte2;
     } BYTES;
 } SHWord;
+
+typedef struct TreeNode_ {
+    struct TreeNode_* left;
+    struct TreeNode_* right;
+    const void* data;
+    s16 height;
+    s16 timer;
+} TreeNode;
 
 typedef struct Viewport_ {
     s16 x, xMin, xMax,
@@ -106,6 +193,14 @@ typedef enum {
     REG_COLL = 1
 } CollType;
 
+typedef struct ActionTile_ {
+    int id; // index of metatile in collMap used as id. MUST BE FIRST
+    struct data_ {
+        s16 respawnTime;
+        u8 TileClass; // index into fp array
+    } data;
+} ActionTile;
+
 typedef enum SceneEnum_ {
     Grassland = 0,
     Home = 1,
@@ -116,12 +211,14 @@ struct SceneData {
     SceneEnum sceneId;
     const SCR_ENTRY* sourceMap;
     void* collisionMap;
+    const ActionTile* actionTileArray;
     u8 mapWInMtiles;
-    u8 mapHInMTiles;
+    u8 mapHInMtiles;
 };
 
 typedef struct Scene_ {
     struct SceneData sceneData;
+    TreeNode* actionTileTree;
     s16 screenX;
     s16 screenY;
     u8 numEnts;
@@ -203,21 +300,8 @@ typedef struct Entity_ {
     u8 objectMode; // 1 byte, needs to be shifted left by ATTR0_MODE_SHIFT (8) to be used in OAM
 } Entity;
 
-typedef struct ActionTile_ {
-    u16 tileX;
-    u16 tileY;
-    s16 respawnTime; // for items
-    u8 TileClass; // index into fp array
-} ActionTile;
-
-typedef struct ActionTileNode_ {
-    struct ActionTileNode_* next;
-    ActionTile* data;
-    s16 timer;
-} ActionTileNode;
-
 typedef struct Node_ {
-    int val;
+    void* data;
     struct Node_* next;
 } Node;
 
@@ -250,11 +334,15 @@ static inline int anglePositiveY(u16 angle) {
     return in_range(angle, 0, 0x7FFF);
 }
 
-void enqueue(Node** head, int val);
-
-int dequeue(Node** head);
-
 #define DIR_COMPASS_MASK    0b011111111
 #define DIAGONAL_MASK       0b011110000
+
+Node* createStack(void* data);
+
+Node* push(Node* node, void* data);
+
+Node* pop(Node* node);
+
+void deleteStack(Node* node);
 
 #endif
