@@ -264,6 +264,6 @@ SWord handleCollisionY(Entity* ent) {
 }
 
 inline int decaySpeed(SWord speed, SWord radius) {
-    speed.WORD -= 0x4000 * !key_is_down(KEY_A);
+    speed.WORD -= PLAYER_DECAY_RATE * !key_is_down(KEY_A);
     return clamp(speed.WORD + (0x8000 * key_is_down(KEY_A)), 0, radius.WORD);
 }

@@ -30,6 +30,7 @@ extern const unsigned short homeMap[1024];
 extern const unsigned short homePal[14];
 
 extern CollisionTileRow256x256 homeColl[16];
+extern ActionTile HomeActionTiles[];
 
 #endif // GRIT_HOME_H
 

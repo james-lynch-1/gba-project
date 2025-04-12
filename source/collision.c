@@ -209,13 +209,9 @@ u32 handleItemTileColl(Position pos, u32 tileColl) {
 
 void doAction(int actionTileId) { // we are testing the ability to use mtile coords as id for action
     TreeNode* node = scene->actionTileTree;
-    bool found = false;
-    while (node && !found) { // search through the tree for actionTileId
-        node = actionTileId < (int)node->data ? node->left : node->right;
-        found = actionTileId == (int)node->data;
-    }
+    node = findTreeNode(scene->actionTileTree, actionTileId);
     if (!node) return;
-    ActionTile* tile = (ActionTile*)node->data;
+    ActionTile* tile = &node->tile;
     pushNewAttack(atks[tile->data.TileClass]);
 }
 

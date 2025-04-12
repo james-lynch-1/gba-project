@@ -681,10 +681,14 @@ CollisionTileRow512x512 grasslandColl[32] __attribute__((aligned(4))) =
 };
 
 ActionTile GrasslandActionTiles[] = {
-	{103, {60, ITEM_CROSSATK}},
-	{107, {60, ITEM_CROSSATK}},
-	{144, {60, ITEM_CROSSATK}},
-	{100, {60, ITEM_CROSSATK}},
+	{103, {60, 1}},
+	{107, {60, 1}},
+	{144, {60, 1}},
+	{100, {60, 1}},
+	{56, {60, 1}},
+	{244, {60, 1}},
+	{245, {60, 1}},
+	{246, {60, 1}},
 	{-1}
 };
 

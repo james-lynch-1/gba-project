@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #define VA ,(void*)&
+#define log(type, val)  mgbaLog(type, (void*)&val)
 
 #define REG_DEBUG_ENABLE (vu16 *)0x4FFF780
 #define REG_DEBUG_FLAGS (vu16 *)0x4FFF700

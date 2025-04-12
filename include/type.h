@@ -143,10 +143,18 @@ typedef union SplitHWord {
     } BYTES;
 } SHWord;
 
+typedef struct ActionTile_ {
+    int id; // index of metatile in collMap used as id. MUST BE FIRST
+    struct data_ {
+        s16 respawnTime;
+        u8 TileClass; // index into fp array
+    } data;
+} ActionTile;
+
 typedef struct TreeNode_ {
     struct TreeNode_* left;
     struct TreeNode_* right;
-    const void* data;
+    ActionTile tile;
     s16 height;
     s16 timer;
 } TreeNode;
@@ -193,14 +201,6 @@ typedef enum {
     REG_COLL = 1
 } CollType;
 
-typedef struct ActionTile_ {
-    int id; // index of metatile in collMap used as id. MUST BE FIRST
-    struct data_ {
-        s16 respawnTime;
-        u8 TileClass; // index into fp array
-    } data;
-} ActionTile;
-
 typedef enum SceneEnum_ {
     Grassland = 0,
     Home = 1,
@@ -210,8 +210,8 @@ typedef enum SceneEnum_ {
 struct SceneData {
     SceneEnum sceneId;
     const SCR_ENTRY* sourceMap;
-    void* collisionMap;
-    const ActionTile* actionTileArray;
+    const void* collisionMap;
+    ActionTile* actionTileArray;
     u8 mapWInMtiles;
     u8 mapHInMtiles;
 };
@@ -339,7 +339,7 @@ static inline int anglePositiveY(u16 angle) {
 
 Node* createStack(void* data);
 
-Node* push(Node* node, void* data);
+Node* stackPush(Node* node, void* data);
 
 Node* pop(Node* node);
 

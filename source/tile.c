@@ -32,51 +32,71 @@ u32 metatileToSeIndex(int metatile, Scene* scene) {
 u32 coordToSeIndex(Position pos, Scene* scene) {
     u32 ty = pos.y.HALF.HI / TILE_WIDTH;
     u32 tx = pos.x.HALF.HI / TILE_WIDTH;
-    u32 sbb = (ty / SBB_WIDTH_T) * scene->sceneData.mapWInMtiles / SBB_WIDTH_MT +
-        tx / SBB_WIDTH_T;
+    u32 sbb = (ty / SBB_WIDTH_T) * scene->sceneData.mapWInMtiles / SBB_WIDTH_MT + tx / SBB_WIDTH_T;
     return sbb * 1024 + (ty & (SBB_WIDTH_T - 1)) * SBB_WIDTH_T + (tx & (SBB_WIDTH_T - 1));
 }
 
-TreeNode* generateActionTileTree(const ActionTile* tileArray) {
+TreeNode* generateActionTileTree(const ActionTile* tileArray) { // TODO fix this
     if (!tileArray) return NULL;
     TreeNode* treePtr = malloc(sizeof(TreeNode));
-    TreeNode tree = {NULL, NULL, (void*)&(tileArray[0]), 0, tileArray[0].data.respawnTime};
+    TreeNode tree = { NULL, NULL, tileArray[0], 0, tileArray[0].data.respawnTime };
     *treePtr = tree;
     int i = 1;
     while (tileArray[i].id != -1) {
-        treePtr = insertTreeNode(treePtr, (void*)&(tileArray[i].data));
+        treePtr = insertTreeNode(treePtr, tileArray[i]); // need to do from head
         i++;
     }
     return treePtr;
 }
 
 void applyActionTileTreeToCollMap(Scene* scene) {
-    
+    if (!scene->actionTileTree) return;
+    Node* traversed = createStack(scene->actionTileTree);
+    TreeNode* nextNode = getNodeDataAsTreeNode(traversed);
+    while (traversed) {
+        if (!nextNode) {
+            nextNode = getNodeDataAsTreeNode(traversed)->right;
+            addActionTileToCollMap(scene, getNodeDataAsTreeNode(traversed));
+            traversed = pop(traversed);
+            if (!traversed) { // when we reach the top of the tree
+                traversed = stackPush(traversed, nextNode);
+                nextNode = nextNode->left;
+            }
+        }
+        else {
+            nextNode = nextNode->left;
+            traversed = stackPush(traversed, nextNode);
+        }
+    }
 }
 
 void addActionTileToCollMap(Scene* scene, TreeNode* actionTileNode) {
-    if (!(scene->actionTileTree)) return;
-    ActionTile tile = *(ActionTile*)(actionTileNode->data);
+    if (!actionTileNode) return;
+    ActionTile tile = actionTileNode->tile;
     int tileY = tile.id / scene->sceneData.mapWInMtiles;
     int tileX = tile.id & (scene->sceneData.mapWInMtiles - 1);
     int halfSBBRow = tileX / 8; // which half SBB-sized chunk of the tileRow we are in
     int tileXInHalfSBBRow = tileX - halfSBBRow * 8;
-    u32 clearingMask = ~(0xF << tileXInHalfSBBRow); // to clear the existing tile completely
-    u32 mask = (tile.data.TileClass << tileXInHalfSBBRow);
+    log(U32, tile.id);
+    u32 clearingMask = ~(0xF << (tileXInHalfSBBRow * 4)); // to clear the existing tile
+    u32 mask = (tile.data.TileClass << (tileXInHalfSBBRow * 4));
+    CollisionTileRow256x256* collMap256Ptr;
+    CollisionTileRow512x512* collMap512Ptr;
+    CollisionTileRow1024x1024* collMap1024Ptr;
 
     switch (scene->sceneData.mapWInMtiles) {
         case 16:
-            CollisionTileRow256x256 * collMap256Ptr = (CollisionTileRow256x256*)scene->sceneData.collisionMap;
+            collMap256Ptr = (CollisionTileRow256x256*)scene->sceneData.collisionMap;
             collMap256Ptr[tileY].halfSBBRow[halfSBBRow] &= clearingMask;
             collMap256Ptr[tileY].halfSBBRow[halfSBBRow] |= mask;
             break;
         case 32:
-            CollisionTileRow512x512 * collMap512Ptr = (CollisionTileRow512x512*)scene->sceneData.collisionMap;
+            collMap512Ptr = (CollisionTileRow512x512*)scene->sceneData.collisionMap;
             collMap512Ptr[tileY].halfSBBRow[halfSBBRow] &= clearingMask;
             collMap512Ptr[tileY].halfSBBRow[halfSBBRow] |= mask;
             break;
         case 64:
-            CollisionTileRow1024x1024 * collMap1024Ptr = (CollisionTileRow1024x1024*)scene->sceneData.collisionMap;
+            collMap1024Ptr = (CollisionTileRow1024x1024*)scene->sceneData.collisionMap;
             collMap1024Ptr[tileY].halfSBBRow[halfSBBRow] &= clearingMask;
             collMap1024Ptr[tileY].halfSBBRow[halfSBBRow] |= mask;
             break;

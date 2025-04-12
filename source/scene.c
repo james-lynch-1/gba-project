@@ -18,12 +18,14 @@ const struct SceneData sceneDataArr[NUM_SCENES] = { {
     .sceneId = Home,
     .sourceMap = homeMap,
     .collisionMap = homeColl,
+    .actionTileArray = HomeActionTiles,
     .mapWInMtiles = 16,
     .mapHInMtiles = 16
 }, {
     .sceneId = Uglybig,
     .sourceMap = uglybigMap,
     .collisionMap = uglybigColl,
+    .actionTileArray = NULL,
     .mapWInMtiles = 64,
     .mapHInMtiles = 64
 } };
@@ -31,6 +33,7 @@ const struct SceneData sceneDataArr[NUM_SCENES] = { {
 void loadScene(Scene* scene, SceneEnum sceneName) {
     scene->sceneData = sceneDataArr[sceneName];
     scene->actionTileTree = generateActionTileTree(scene->sceneData.actionTileArray);
+    applyActionTileTreeToCollMap(scene);
 
     vp.xMax = scene->sceneData.mapWInMtiles * 16 - SCR_W;
     vp.yMax = scene->sceneData.mapHInMtiles * 16 - SCR_H;

@@ -241,4 +241,13 @@ CollisionTileRow256x256 homeColl[16] __attribute__((aligned(4))) =
 	{.row = {0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0}}
 };
 
+ActionTile HomeActionTiles[] = {
+	{103, {60, 1}},
+	{107, {60, 1}},
+	{144, {60, 1}},
+	{100, {60, 1}},
+	{56, {60, 1}},
+	{-1}
+};
+
 //}}BLOCK(home)

@@ -53,7 +53,8 @@
         "attacks.h": "c",
         "player.h": "c",
         "queue.h": "c",
-        "uglybig.h": "c"
+        "uglybig.h": "c",
+        "hitbox.h": "c"
     },
     "VSCodeCounter.exclude": [
         "**/.gitignore",
