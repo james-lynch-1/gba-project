@@ -24,7 +24,7 @@ void handlePlayerAttacks(Entity* ent, int crosshairEntColl) {
     Entity player = *entities;
     AttackInstance* atkInst = player.attacksActive;
     while (atkInst != NULL) {
-        if (atkInst->attack->range[crosshairEntColl] != 0 && atkInst->firing && !(atkInst->cooldownTimer))
+        if (atkInst->attack->range[crosshairEntColl] != 0 && atkInst->firing && !(atkInst->cooldownTimer) && atkInst->timer < atkInst->attack->duration)
             beAtkdFns[atkInst->attack->atkClass](ent, atkInst->attack->range[crosshairEntColl]);
         atkInst = atkInst->next;
     }
@@ -42,7 +42,7 @@ void updateAttackDirect(AttackInstance* atkInst) {
         atkInst->toBeDeleted = 1;
         return;
     }
-    if (atkInst->firing) {
+    if (atkInst->firing) { // for direct attacks only... special atks, firing always = 1
         atkInst->timer--;
         return;
     }
@@ -89,7 +89,7 @@ void pushNewAttack(Attack* atk) {
         slot->next = atkInstPtr;
         numAttacks++;
     }
-    else mgbaLog(CHAR VA "too many attacks");
+    else log(CHAR, "too many attacks");
 }
 
 // Range array: E, S, W, N, SE, SW, NW, NE, CTR

@@ -4,12 +4,13 @@
 #include "log.h"
 #include "graphics/maps/grassland.h"
 #include "attacks.h"
+#include "entity.h"
 
 extern Entity* entities;
 extern Scene* scene;
 
 TileCollArray TileCollArrays[16] = {
-    {}, // empty
+    {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}, // empty
     {
         {0b1111111111111111u,
          0b1111111111111111u,
@@ -204,46 +205,51 @@ u32 getInTilePointColl(Position pos, u32 tileColl) {
 }
 
 u32 handleItemTileColl(Position pos, u32 tileColl) {
+    TreeNode* node = findTreeNode(scene->actionTileTree, coordToMetatile(pos, scene));
+    pushNewAttack(atks[node->tile.data.action]);
+    const void* collMap = scene->sceneData.sourceCollisionMap;
+    int originalCollision = getPointCollFns[scene->sceneData.mapWInMtiles / 16 - 1](pos, collMap);
+    TreeNode restoreNode = { NULL, NULL, {node->tile.id, {0, originalCollision, 0}} };
+    addActionTileToCollMap(scene, &restoreNode);
     return 0;
 }
 
-void doAction(int actionTileId) { // we are testing the ability to use mtile coords as id for action
-    TreeNode* node = scene->actionTileTree;
-    node = findTreeNode(scene->actionTileTree, actionTileId);
-    if (!node) return;
-    ActionTile* tile = &node->tile;
-    pushNewAttack(atks[tile->data.TileClass]);
+int doAction(int actionTileId) {
+    // TreeNode* node = scene->actionTileTree;
+    // node = findTreeNode(scene->actionTileTree, actionTileId);
+    // if (!node) return 0;
+    // ActionTile* tile = &node->tile;
+    return 0;
 }
 
 u32 handleActionTileColl(Position pos, u32 tileColl) {
     int mTile = coordToMetatile(pos, scene);
-    doAction(mTile);
-    return 0;
+    return doAction(mTile);
 }
 
-u32(* const getPointCollFns[])(Position pos, Scene* scene) = {
+u32(* const getPointCollFns[])(Position pos, void* collisionMap) = {
     getPointCollision256x256,
     getPointCollision512x512,
     NULL,
     getPointCollision1024x1024
 };
 
-u32 getPointCollision256x256(Position pos, Scene* scene) {
-    CollisionTileRow256x256* sglCollRowPtr = (CollisionTileRow256x256*)scene->sceneData.collisionMap;
+u32 getPointCollision256x256(Position pos, void* collisionMap) {
+    CollisionTileRow256x256* sglCollRowPtr = (CollisionTileRow256x256*)collisionMap;
     u32 tileColl = sglCollRowPtr[pos.y.HALF.HI / MT_WIDTH].halfSBBRow[pos.x.HALF.HI / 128] >>
         ((pos.x.HALF.HI & 127) / 16 * COLL_BITWIDTH) & PACKED_COLLMAP_MASK;
     return handlePointCollFns[tileColl](pos, tileColl);
 }
 
-u32 getPointCollision512x512(Position pos, Scene* scene) {
-    CollisionTileRow512x512* dblCollRowPtr = (CollisionTileRow512x512*)scene->sceneData.collisionMap;
+u32 getPointCollision512x512(Position pos, void* collisionMap) {
+    CollisionTileRow512x512* dblCollRowPtr = (CollisionTileRow512x512*)collisionMap;
     u32 tileColl = dblCollRowPtr[pos.y.HALF.HI / MT_WIDTH].halfSBBRow[pos.x.HALF.HI / 128] >>
         ((pos.x.HALF.HI & 127) / 16 * COLL_BITWIDTH) & PACKED_COLLMAP_MASK;
     return handlePointCollFns[tileColl](pos, tileColl);
 }
 
-u32 getPointCollision1024x1024(Position pos, Scene* scene) {
-    CollisionTileRow1024x1024* quadCollRowPtr = (CollisionTileRow1024x1024*)scene->sceneData.collisionMap;
+u32 getPointCollision1024x1024(Position pos, void* collisionMap) {
+    CollisionTileRow1024x1024* quadCollRowPtr = (CollisionTileRow1024x1024*)collisionMap;
     u32 tileColl = quadCollRowPtr[pos.y.HALF.HI / MT_WIDTH].halfSBBRow[pos.x.HALF.HI / 128] >>
         ((pos.x.HALF.HI & 127) / 16 * COLL_BITWIDTH) & PACKED_COLLMAP_MASK;
     return handlePointCollFns[tileColl](pos, tileColl);
@@ -253,7 +259,7 @@ u32 getPointCollision1024x1024(Position pos, Scene* scene) {
 u32 getEdgePointCollision(Position pos, Hitbox hb, Direction dir, Scene* scene) {
     pos.x.HALF.HI += hb.xOffset + lu_cos(dir) > 0 ? hb.rightOffset : hb.leftOffset;
     pos.y.HALF.HI += hb.yOffset + -lu_sin(dir) > 0 ? hb.bottomOffset : hb.topOffset;
-    return getPointCollFns[scene->sceneData.mapWInMtiles / 16 - 1](pos, scene);
+    return getPointCollFns[scene->sceneData.mapWInMtiles / 16 - 1](pos, scene->collisionMap);
 }
 
 /** Only takes a cardinal direction. Returns collision for three points along a SINGLE side. */

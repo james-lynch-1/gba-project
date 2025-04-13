@@ -56,7 +56,17 @@ enum ItemClass { // corresponds with atk array in attacks.c
 #define NUM_ITEMS   11
 
 enum ActionClass {
-    ACTION_ADD_ITEM,
+    ACTION_ADD_ATK0,
+    ACTION_ADD_ATK1,
+    ACTION_ADD_ATK2,
+    ACTION_ADD_ATK3,
+    ACTION_ADD_ATK4,
+    ACTION_ADD_ATK5,
+    ACTION_ADD_ATK6,
+    ACTION_ADD_ATK7,
+    ACTION_ADD_ATK8,
+    ACTION_ADD_ATK9,
+    ACTION_ADD_ATK10,
 };
 
 enum AtkClass {
@@ -147,7 +157,8 @@ typedef struct ActionTile_ {
     int id; // index of metatile in collMap used as id. MUST BE FIRST
     struct data_ {
         s16 respawnTime;
-        u8 TileClass; // index into fp array
+        u8 tileClass; // index into fp array
+        u8 action; // if tileClass == 15, or item index if tileClass == 14
     } data;
 } ActionTile;
 
@@ -210,7 +221,7 @@ typedef enum SceneEnum_ {
 struct SceneData {
     SceneEnum sceneId;
     const SCR_ENTRY* sourceMap;
-    const void* collisionMap;
+    const void* sourceCollisionMap;
     ActionTile* actionTileArray;
     u8 mapWInMtiles;
     u8 mapHInMtiles;
@@ -219,6 +230,7 @@ struct SceneData {
 typedef struct Scene_ {
     struct SceneData sceneData;
     TreeNode* actionTileTree;
+    void* collisionMap;
     s16 screenX;
     s16 screenY;
     u8 numEnts;

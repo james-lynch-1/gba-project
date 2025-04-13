@@ -49,7 +49,7 @@ Entity* loadPlayer() {
 /** assumes one ent (player) already exists */
 Entity* loadEnt() {
     if (numEnts >= 16) {
-        mgbaLog(CHAR VA "numEnts at maximum");
+        log(CHAR, "numEnts at maximum");
         return NULL;
     }
     Entity* currEnt = entities;

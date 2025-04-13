@@ -43,6 +43,7 @@ void handleInput() {
         if (id >= NUM_SCENES) id = 0;
         player->position.x.WORD = 180 << 16;
         player->position.y.WORD = 160 << 16;
+        unloadScene(scene);
         loadScene(scene, id);
         return;
     }
@@ -83,6 +84,7 @@ void handleInput() {
     if (nextId != NUM_SCENES) {
         player->position.y.HALF.HI = clamp(player->position.y.HALF.HI, hBoxTOffset(hb),
             sceneDataArr[nextId].mapHInMtiles * MT_WIDTH - hBoxBOffset(hb) - 2);
+        unloadScene(scene);
         loadScene(scene, nextId);
     }
 }
@@ -119,22 +121,14 @@ void updateEntityAffine(Entity* player) {
 
 void dig(Entity* player, Scene* scene) {
     MtTileArray tiles = posToMtTiles(player->position, scene);
-    mgbaLog(U16 VA tiles.t0);
-    mgbaLog(U16 VA tiles.t1);
-    mgbaLog(U16 VA tiles.t2);
-    mgbaLog(U16 VA tiles.t3);
+    log(U16, tiles.t0);
+    log(U16, tiles.t1);
+    log(U16, tiles.t2);
+    log(U16, tiles.t3);
 }
 
 void updateAttacks() {
-    // decrement attack timers and delete completed attacks
     AttackInstance* atkInst = entities->attacksActive;
-    // while (atkInst != NULL && atkInst->toBeDeleted) {
-    //     entities->attacksActive = entities->attacksActive->next;
-    //     free(atkInst);
-    //     numAttacks--;
-    //     atkInst = entities->attacksActive;
-    // }
-    // now assuming the first one has non-zero timer
     int atkIndex = 0;
     while (atkInst != NULL) {
         if (atkInst->next && atkInst->next->toBeDeleted) { // checking/deleting the next one cos no prev pointer

@@ -5,7 +5,7 @@ Node* createStack(void* data) {
     Node* headPtr = malloc(sizeof(Node));
     if (!headPtr) return NULL;
     Node head = {data, NULL};
-    *headPtr = head; // points to 0x20000a8 the first few times, then points to 0x20000 the last time for some reason
+    *headPtr = head;
     return headPtr;
 }
 

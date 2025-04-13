@@ -11,7 +11,7 @@ typedef struct MtTileArray_ {
     u16 t2; u16 t3;
 } MtTileArray;
 
-enum TileClass {
+enum tileClass {
     T_EMPTY = 0,
     T_FILLED = 1,
     T_NW_FILLED = 2,

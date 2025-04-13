@@ -43,7 +43,7 @@ TreeNode* generateActionTileTree(const ActionTile* tileArray) { // TODO fix this
     *treePtr = tree;
     int i = 1;
     while (tileArray[i].id != -1) {
-        treePtr = insertTreeNode(treePtr, tileArray[i]); // need to do from head
+        treePtr = insertTreeNode(treePtr, tileArray[i]);
         i++;
     }
     return treePtr;
@@ -51,23 +51,23 @@ TreeNode* generateActionTileTree(const ActionTile* tileArray) { // TODO fix this
 
 void applyActionTileTreeToCollMap(Scene* scene) {
     if (!scene->actionTileTree) return;
-    Node* traversed = createStack(scene->actionTileTree);
-    TreeNode* nextNode = getNodeDataAsTreeNode(traversed);
-    while (traversed) {
+    Node* traversed = NULL;
+    TreeNode* nextNode = scene->actionTileTree;
+    do {
         if (!nextNode) {
             nextNode = getNodeDataAsTreeNode(traversed)->right;
             addActionTileToCollMap(scene, getNodeDataAsTreeNode(traversed));
             traversed = pop(traversed);
             if (!traversed) { // when we reach the top of the tree
                 traversed = stackPush(traversed, nextNode);
-                nextNode = nextNode->left;
+                if (nextNode) nextNode = nextNode->left;
             }
         }
         else {
-            nextNode = nextNode->left;
             traversed = stackPush(traversed, nextNode);
+            nextNode = nextNode->left;
         }
-    }
+    } while (traversed);
 }
 
 void addActionTileToCollMap(Scene* scene, TreeNode* actionTileNode) {
@@ -77,26 +77,25 @@ void addActionTileToCollMap(Scene* scene, TreeNode* actionTileNode) {
     int tileX = tile.id & (scene->sceneData.mapWInMtiles - 1);
     int halfSBBRow = tileX / 8; // which half SBB-sized chunk of the tileRow we are in
     int tileXInHalfSBBRow = tileX - halfSBBRow * 8;
-    log(U32, tile.id);
     u32 clearingMask = ~(0xF << (tileXInHalfSBBRow * 4)); // to clear the existing tile
-    u32 mask = (tile.data.TileClass << (tileXInHalfSBBRow * 4));
+    u32 mask = (tile.data.tileClass << (tileXInHalfSBBRow * 4));
     CollisionTileRow256x256* collMap256Ptr;
     CollisionTileRow512x512* collMap512Ptr;
     CollisionTileRow1024x1024* collMap1024Ptr;
 
     switch (scene->sceneData.mapWInMtiles) {
         case 16:
-            collMap256Ptr = (CollisionTileRow256x256*)scene->sceneData.collisionMap;
+            collMap256Ptr = (CollisionTileRow256x256*)scene->collisionMap;
             collMap256Ptr[tileY].halfSBBRow[halfSBBRow] &= clearingMask;
             collMap256Ptr[tileY].halfSBBRow[halfSBBRow] |= mask;
             break;
         case 32:
-            collMap512Ptr = (CollisionTileRow512x512*)scene->sceneData.collisionMap;
+            collMap512Ptr = (CollisionTileRow512x512*)scene->collisionMap;
             collMap512Ptr[tileY].halfSBBRow[halfSBBRow] &= clearingMask;
             collMap512Ptr[tileY].halfSBBRow[halfSBBRow] |= mask;
             break;
         case 64:
-            collMap1024Ptr = (CollisionTileRow1024x1024*)scene->sceneData.collisionMap;
+            collMap1024Ptr = (CollisionTileRow1024x1024*)scene->collisionMap;
             collMap1024Ptr[tileY].halfSBBRow[halfSBBRow] &= clearingMask;
             collMap1024Ptr[tileY].halfSBBRow[halfSBBRow] |= mask;
             break;
@@ -104,8 +103,4 @@ void addActionTileToCollMap(Scene* scene, TreeNode* actionTileNode) {
             break;
     }
     return;
-}
-
-void removeActionTileFromCollMap(Scene* scene, TreeNode* actionTileNode) {
-    if (!(scene->actionTileTree)) return;
 }

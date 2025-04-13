@@ -34,12 +34,13 @@ TreeNode* rightRotate(TreeNode* y) {
 }
 
 TreeNode* insertTreeNode(TreeNode* head, ActionTile tile) {
+    TreeNode* newNodePtr = malloc(sizeof(TreeNode));
+    if (!newNodePtr) return NULL;
     Node* traversed = createStack(head);
     int traversedLength = 1;
     traversed = traverseTree(traversed, tile.id, &traversedLength);
     TreeNode* lastNode = (TreeNode*)(traversed->data);
     TreeNode newNode = { NULL, NULL, tile, 0, 0 };
-    TreeNode* newNodePtr = malloc(sizeof(TreeNode));
     *newNodePtr = newNode;
     if (tile.id < lastNode->tile.id)
         lastNode->left = newNodePtr;
@@ -117,7 +118,6 @@ Node* traverseTree(Node* firstNode, int tileIndex, int* length) {
     do {
         if (!treeNode) break;
         treeNode = tileIndex <= (treeNode->tile.id) ? treeNode->left : treeNode->right;
-        // BUG: treeNode->left should be null but it's not for some reason
         stackPtr = stackPush(stackPtr, treeNode);
         l++;
     } while (treeNode);
@@ -126,34 +126,24 @@ Node* traverseTree(Node* firstNode, int tileIndex, int* length) {
 }
 
 void deleteAllTreeNodes(TreeNode* head) {
-    int traversedLength = 0;
-    Node* traversed = createStack((void*)head);
-    traversed = traverseTree(traversed, 0, &traversedLength);
-    TreeNode* currTreeNode = (TreeNode*)(traversed->data);
-    int treeNodeChildData;
-    TreeNode* nodeToFree;
-    while (traversed) {
-        if (!(currTreeNode->left)) {
-            if (!(currTreeNode->right)) {
-                traversed = pop(traversed);
-                traversedLength--;
-                treeNodeChildData = currTreeNode->tile.id; // id
-                currTreeNode = (TreeNode*)(traversed->data);
-                if (treeNodeChildData < currTreeNode->tile.id) { // was child left or right
-                    nodeToFree = currTreeNode->left;
-                    currTreeNode->left = NULL;
-                }
-                else {
-                    nodeToFree = currTreeNode->right;
-                    currTreeNode->right = NULL;
-                }
-                free(nodeToFree);
-            }
-            else if (currTreeNode->right) {
-                traversed = traverseTree(traversed, currTreeNode->tile.id + 1, &traversedLength);
+    if (!head) return;
+    Node* traversed = NULL;
+    TreeNode* nextNode = head;
+    do {
+        if (!nextNode) {
+            nextNode = getNodeDataAsTreeNode(traversed)->right;
+            free(getNodeDataAsTreeNode(traversed));
+            traversed = pop(traversed);
+            if (!traversed) { // when we reach the top of the tree
+                traversed = stackPush(traversed, nextNode);
+                if (nextNode) nextNode = nextNode->left;
             }
         }
-    }
+        else {
+            traversed = stackPush(traversed, nextNode);
+            nextNode = nextNode->left;
+        }
+    } while (traversed);
 }
 
 // must be leaf node... will change later

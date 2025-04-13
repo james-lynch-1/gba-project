@@ -10,21 +10,21 @@ extern Viewport vp;
 const struct SceneData sceneDataArr[NUM_SCENES] = { {
     .sceneId = Grassland,
     .sourceMap = grasslandMap,
-    .collisionMap = grasslandColl,
+    .sourceCollisionMap = grasslandColl,
     .actionTileArray = GrasslandActionTiles,
     .mapWInMtiles = 32,
     .mapHInMtiles = 32
 }, {
     .sceneId = Home,
     .sourceMap = homeMap,
-    .collisionMap = homeColl,
+    .sourceCollisionMap = homeColl,
     .actionTileArray = HomeActionTiles,
     .mapWInMtiles = 16,
     .mapHInMtiles = 16
 }, {
     .sceneId = Uglybig,
     .sourceMap = uglybigMap,
-    .collisionMap = uglybigColl,
+    .sourceCollisionMap = uglybigColl,
     .actionTileArray = NULL,
     .mapWInMtiles = 64,
     .mapHInMtiles = 64
@@ -33,6 +33,24 @@ const struct SceneData sceneDataArr[NUM_SCENES] = { {
 void loadScene(Scene* scene, SceneEnum sceneName) {
     scene->sceneData = sceneDataArr[sceneName];
     scene->actionTileTree = generateActionTileTree(scene->sceneData.actionTileArray);
+    switch (scene->sceneData.mapWInMtiles) {
+        case 16:
+            scene->collisionMap = malloc(sizeof(CollisionTileRow256x256) * scene->sceneData.mapHInMtiles);
+            memcpy32(scene->collisionMap, scene->sceneData.sourceCollisionMap,
+                (sizeof(CollisionTileRow256x256) / sizeof(int)) * scene->sceneData.mapHInMtiles);
+            break;
+        case 32:
+            scene->collisionMap = malloc(sizeof(CollisionTileRow512x512) * scene->sceneData.mapHInMtiles);
+            memcpy32(scene->collisionMap, scene->sceneData.sourceCollisionMap,
+                (sizeof(CollisionTileRow512x512) / sizeof(int)) * scene->sceneData.mapHInMtiles);
+            break;
+        case 64:
+        default:
+            scene->collisionMap = malloc(sizeof(CollisionTileRow1024x1024) * scene->sceneData.mapHInMtiles);
+            memcpy32(scene->collisionMap, scene->sceneData.sourceCollisionMap,
+                (sizeof(CollisionTileRow1024x1024) / sizeof(int)) * scene->sceneData.mapHInMtiles);
+            break;
+    }
     applyActionTileTreeToCollMap(scene);
 
     vp.xMax = scene->sceneData.mapWInMtiles * 16 - SCR_W;
@@ -42,7 +60,6 @@ void loadScene(Scene* scene, SceneEnum sceneName) {
     scene->screenY = vp.y;
     updateBGTiles(scene);
 
-    markAllEntsToBeDeleted();
     scene->numEnts = numEnts;
 
     scene->tid = 0;
@@ -84,6 +101,14 @@ void loadScene(Scene* scene, SceneEnum sceneName) {
             break;
     }
     return;
+}
+
+void unloadScene(Scene* scene) {
+    deleteAllTreeNodes(scene->actionTileTree);
+    scene->actionTileTree = NULL;
+    scene->numEnts = 0;
+    free(scene->collisionMap);
+    markAllEntsToBeDeleted();
 }
 
 void loadBG(const u16* pal, int palLen, const u16* tiles, int tilesLen, const u16* map, int mapLen,

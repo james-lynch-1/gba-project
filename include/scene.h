@@ -10,6 +10,7 @@
 const extern struct SceneData sceneDataArr[NUM_SCENES];
 
 void loadScene(Scene* currScene, SceneEnum sceneName);
+void unloadScene(Scene* scene);
 void loadBG(const u16* pal, int palLen, const u16* tiles, int tilesLen, const u16* map, int mapLen, Scene* scene);
 void copyTileCol(Scene* scene, int tileX, int tileY);
 void copyTileRow(Scene* scene, int tileX, int tileY);

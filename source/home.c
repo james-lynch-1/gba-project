@@ -242,11 +242,11 @@ CollisionTileRow256x256 homeColl[16] __attribute__((aligned(4))) =
 };
 
 ActionTile HomeActionTiles[] = {
-	{103, {60, 1}},
-	{107, {60, 1}},
-	{144, {60, 1}},
-	{100, {60, 1}},
-	{56, {60, 1}},
+	{103, {60, 14, ITEM_CROSSATK}},
+	{107, {60, 14, ITEM_CROSSATK}},
+	{144, {60, 14, ITEM_CROSSATK}},
+	{100, {60, 14, ITEM_CROSSATK}},
+	{56, {60, 14, ITEM_CROSSATK}},
 	{-1}
 };
 

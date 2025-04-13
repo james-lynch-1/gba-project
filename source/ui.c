@@ -38,7 +38,6 @@ void updateQuadCountdownUI(AttackInstance* atkInst, int atkIndex) {
 }
 
 void updateBasicAttackUI(AttackInstance* atkInst, int atkIndex) {
-    // mgbaLog(S16 VA atkInst->timer);
     Attack* atk = atkInst->attack;
     int t, denom;
     switch ((atkInst->cooldownTimer != 0) + 2 * (atkInst->timer < atk->duration)) {
