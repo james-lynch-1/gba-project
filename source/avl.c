@@ -40,7 +40,7 @@ TreeNode* insertTreeNode(TreeNode* head, ActionTile tile) {
     int traversedLength = 1;
     traversed = traverseTree(traversed, tile.id, &traversedLength);
     TreeNode* lastNode = (TreeNode*)(traversed->data);
-    TreeNode newNode = { NULL, NULL, tile, 0, 0 };
+    TreeNode newNode = { NULL, NULL, tile, 0, tile.data.respawnTime };
     *newNodePtr = newNode;
     if (tile.id < lastNode->tile.id)
         lastNode->left = newNodePtr;

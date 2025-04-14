@@ -120,7 +120,7 @@ void updateEntityAffine(Entity* player) {
 }
 
 void dig(Entity* player, Scene* scene) {
-    MtTileArray tiles = posToMtTiles(player->position, scene);
+    MtTileArray tiles = posToMtTileArray(player->position, scene);
     log(U16, tiles.t0);
     log(U16, tiles.t1);
     log(U16, tiles.t2);

@@ -5,7 +5,7 @@ u32 frameCount = 0;
 OBJ_ATTR obj_buffer[MAX_ENTS];
 OBJ_AFFINE* obj_aff_buffer = (OBJ_AFFINE*)obj_buffer;
 Entity* entities;
-Scene* scene;
+Scene* scene = NULL;
 Viewport vp = {0, 0, 0, 0, 0, 0};
 Direction dPadDir = STATIONARY;
 int numEnts = 0;
@@ -20,6 +20,7 @@ int main() {
 		updateAttacks();
 		handleScroll();
 		updateEnts();
+		updateActionTiles(scene);
 		updateCrosshair();
 
 		oam_copy(oam_mem, obj_buffer, 128);

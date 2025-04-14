@@ -45,15 +45,20 @@ void updateBGTiles(Scene* scene) {
     if (tileX < oldTileX) // scroll left
         copyTileCol(scene, tileX, tileY);
     else if (tileX > oldTileX) // scroll right
-        copyTileCol(scene, tileX + 31, tileY);
+        copyTileCol(scene, tileX + 30, tileY);
     
     if (tileY < oldTileY) // scroll up
         copyTileRow(scene, tileX, tileY);
     else if (tileY > oldTileY) // scroll down
-        copyTileRow(scene, tileX, tileY + 31);
+        copyTileRow(scene, tileX, tileY + 30);
     scene->screenX = vp.x;
     scene->screenY = vp.y;
 
     REG_BG0HOFS = scene->screenX;
     REG_BG0VOFS = scene->screenY;
+}
+
+bool mTileIsWithinViewport(Position pos, Viewport vp) {
+    return ((pos.x.HALF.HI > vp.x - 16) && (pos.x.HALF.HI < vp.x + SCREEN_WIDTH) &&
+            (pos.y.HALF.HI > vp.y - 16) && (pos.y.HALF.HI < vp.y + SCREEN_HEIGHT));
 }

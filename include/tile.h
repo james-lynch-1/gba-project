@@ -2,9 +2,14 @@
 #define tileh
 
 #include "type.h"
+#include "log.h"
 #include "constants.h"
 #include "scene.h"
 #include "avl.h"
+#include "graphics/graphics.h"
+
+extern Scene* scene;
+extern Viewport vp;
 
 typedef struct MtTileArray_ {
     u16 t0; u16 t1;
@@ -25,14 +30,23 @@ enum tileClass {
     T_ACTION = 15
 };
 
-MtTileArray posToMtTiles(Position pos, Scene* scene);
-int coordToMetatile(Position pos, Scene* scene);
+MtTileArray posToMtTileArray(Position pos, Scene* scene);
+MtTileArray sEIndexToMTiles(int sEIndex, Scene* scene);
+Position mTileToPos(int mTile, Scene* scene);
+int coordToMtile(Position pos, Scene* scene);
 u32 coordToMtSeIndex(Position pos, Scene* scene);
-u32 metatileToSeIndex(int metatile, Scene* scene);
+u32 mTileToSEIndex(int metatile, Scene* scene);
+u32 mTileToSEIndexFast(int metatile, Scene* scene);
 u32 coordToSeIndex(Position pos, Scene* scene);
 
 TreeNode* generateActionTileTree(const ActionTile* tileArray);
 void applyActionTileTreeToCollMap(Scene* scene);
 void addActionTileToCollMap(Scene* scene, TreeNode* actionTileNode);
+
+void updateActionTiles();
+
+void updateActionTile(TreeNode* node);
+
+void drawMTile(int sEIndex, int tileMemIndex, int pal);
 
 #endif

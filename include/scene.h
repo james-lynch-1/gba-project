@@ -23,4 +23,6 @@ void moveSpriteOnScreen(Entity* ent, Position offset);
 bool checkIfOnScreen(Entity* ent);
 void updateBGTiles(Scene* scene);
 
+bool mTileIsWithinViewport(Position pos, Viewport vp);
+
 #endif

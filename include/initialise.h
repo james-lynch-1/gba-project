@@ -8,6 +8,7 @@
 void initialise();
 void loadUI();
 void loadSprites();
+void loadTiles();
 Scene* loadSceneInitial(SceneEnum sceneName);
 
 #endif

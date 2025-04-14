@@ -22,6 +22,7 @@ void initialise() {
     scene = loadSceneInitial(Grassland);
     loadSprites();
     loadUI();
+    loadTiles();
 }
 
 
@@ -55,6 +56,12 @@ void loadSprites() {
 
     memcpy32(pal_obj_bank[0], squinky1Pal, squinkyPalLen / sizeof(u32));
     memcpy32(&pal_obj_bank[1], debugBlobPal, debugBlobPalLen / sizeof(u32));
+}
+
+// commonly used bg tiles such as item pickups
+void loadTiles() {
+    memcpy32(&tile_mem[0][500], atkIconsTiles, atkIconsTilesLen / sizeof(u32));
+    memcpy32(pal_bg_bank[13], atkIconsPal, atkIconsPalLen / sizeof(u32));
 }
 
 Scene* loadSceneInitial(SceneEnum sceneName) {

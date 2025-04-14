@@ -205,12 +205,15 @@ u32 getInTilePointColl(Position pos, u32 tileColl) {
 }
 
 u32 handleItemTileColl(Position pos, u32 tileColl) {
-    TreeNode* node = findTreeNode(scene->actionTileTree, coordToMetatile(pos, scene));
+    TreeNode* node = findTreeNode(scene->actionTileTree, coordToMtile(pos, scene));
+    int seIndex = mTileToSEIndexFast(node->tile.id, scene);
     pushNewAttack(atks[node->tile.data.action]);
-    const void* collMap = scene->sceneData.sourceCollisionMap;
+    void* collMap = (void*)scene->sceneData.sourceCollisionMap;
     int originalCollision = getPointCollFns[scene->sceneData.mapWInMtiles / 16 - 1](pos, collMap);
     TreeNode restoreNode = { NULL, NULL, {node->tile.id, {0, originalCollision, 0}} };
     addActionTileToCollMap(scene, &restoreNode);
+    drawMTile(seIndex, *&scene->sceneData.sourceMap[3], 0); // restore original tile
+    node->timer = 0;
     return 0;
 }
 
@@ -223,7 +226,7 @@ int doAction(int actionTileId) {
 }
 
 u32 handleActionTileColl(Position pos, u32 tileColl) {
-    int mTile = coordToMetatile(pos, scene);
+    int mTile = coordToMtile(pos, scene);
     return doAction(mTile);
 }
 
