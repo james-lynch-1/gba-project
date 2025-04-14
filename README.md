@@ -23,10 +23,11 @@ Different attack types (screen filling, top-left/top-right/bottom-left/bottom-ri
 Dynamic memory allocation for enemies and player attacks  
 Countdown/time remaining UI for attacks  
 Multiple areas  
+Item pickups  
 
 ## TO BE IMPLEMENTED:
-Memory manager for sprite VRAM
-Collectible weapons/attacks from enemies/item pickups  
+Memory manager for sprite VRAM  
+Collectible weapons/attacks from enemies  
 Basic enemy AI/movement  
 Shell script to convert exported Usenti maps to condensed collision maps  
 Inventory system  
