@@ -31,12 +31,15 @@ enum tileClass {
 };
 
 MtTileArray posToMtTileArray(Position pos, Scene* scene);
-MtTileArray sEIndexToMTiles(int sEIndex, Scene* scene);
-Position mTileToPos(int mTile, Scene* scene);
+MtTileArray sEIndexToMtTileArraySBB(u32 sEIndex);
+MtTileArray sEIndexToMtTileArrayFlat(u32 sEIndex, Scene* scene);
+Position mTileToPos(u32 mTile, Scene* scene);
 int coordToMtile(Position pos, Scene* scene);
+u32 mTileToSEIndex(u32 mTile, Scene* scene);
 u32 coordToMtSeIndex(Position pos, Scene* scene);
-u32 mTileToSEIndex(int metatile, Scene* scene);
-u32 mTileToSEIndexFast(int metatile, Scene* scene);
+u32 mTileToSEIndexFast(u32 metatile, Scene* scene);
+u32 mTileToSEIndexFlat(u32 metatile, Scene* scene);
+MtTileArray mTileToMtTileArrayFlat(u32 metatile, Scene* scene);
 u32 coordToSeIndex(Position pos, Scene* scene);
 
 TreeNode* generateActionTileTree(const ActionTile* tileArray);
@@ -47,6 +50,8 @@ void updateActionTiles();
 
 void updateActionTile(TreeNode* node);
 
-void drawMTile(int sEIndex, int tileMemIndex, int pal);
+void drawMTile(u32 sEIndex, u32 tileMemIndex, int pb);
+
+void drawMTileFromRom(u32 dstSEIndex, MtTileArray srcMtTileArray);
 
 #endif

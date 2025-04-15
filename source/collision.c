@@ -206,20 +206,20 @@ u32 getInTilePointColl(Position pos, u32 tileColl) {
 
 u32 handleItemTileColl(Position pos, u32 tileColl) {
     TreeNode* node = findTreeNode(scene->actionTileTree, coordToMtile(pos, scene));
-    int seIndex = mTileToSEIndexFast(node->tile.id, scene);
+    u32 seIndex = mTileToSEIndexFast(node->tile.id, scene);
+    MtTileArray srcMtTileArray = mTileToMtTileArrayFlat(node->tile.id, scene);
     pushNewAttack(atks[node->tile.data.action]);
     void* collMap = (void*)scene->sceneData.sourceCollisionMap;
     int originalCollision = getPointCollFns[scene->sceneData.mapWInMtiles / 16 - 1](pos, collMap);
     TreeNode restoreNode = { NULL, NULL, {node->tile.id, {0, originalCollision, 0}} };
-    addActionTileToCollMap(scene, &restoreNode);
-    drawMTile(seIndex, *&scene->sceneData.sourceMap[3], 0); // restore original tile
+    addActionTileToCollMap(scene, &restoreNode); // restore original collision
+    drawMTileFromRom(seIndex, srcMtTileArray); // restore original tile
     node->timer = 0;
     return 0;
 }
 
 int doAction(int actionTileId) {
-    // TreeNode* node = scene->actionTileTree;
-    // node = findTreeNode(scene->actionTileTree, actionTileId);
+    // TreeNode* node = findTreeNode(scene->actionTileTree, actionTileId);
     // if (!node) return 0;
     // ActionTile* tile = &node->tile;
     return 0;

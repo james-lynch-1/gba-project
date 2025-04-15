@@ -34,6 +34,7 @@ void mgbaLog(Type type, void* messagePtr) {
         break;
     case U8:
         length = sprintf(message, "u8: %d", *(u8*)messagePtr);
+        break;
     case S32:
         length = sprintf(message, "s32: %d", *(s32*)messagePtr);
         break;

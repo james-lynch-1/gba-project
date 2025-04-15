@@ -154,7 +154,7 @@ typedef union SplitHWord {
 } SHWord;
 
 typedef struct ActionTile_ {
-    int id; // index of metatile in collMap used as id. MUST BE FIRST
+    u32 id; // index of metatile in collMap used as id. MUST BE FIRST
     struct data_ {
         s16 respawnTime;
         u8 tileClass; // index into fp array

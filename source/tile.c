@@ -1,18 +1,33 @@
 #include "tile.h"
 
 inline MtTileArray posToMtTileArray(Position pos, Scene* scene) {
-    return sEIndexToMTiles(coordToMtSeIndex(pos, scene), scene);
+    return sEIndexToMtTileArraySBB(coordToMtSeIndex(pos, scene));
 }
 
-inline MtTileArray sEIndexToMTiles(int sEIndex, Scene* scene) {
-    MtTileArray tiles = { .t0 = sEIndex, .t1 = sEIndex + 1,
-        .t2 = sEIndex + SBB_WIDTH_T, .t3 = sEIndex + SBB_WIDTH_T + 1 };
+inline MtTileArray sEIndexToMtTileArraySBB(u32 sEIndex) {
+    MtTileArray tiles = {
+        .t0 = sEIndex,
+        .t1 = sEIndex + 1,
+        .t2 = sEIndex + SBB_WIDTH_T,
+        .t3 = sEIndex + SBB_WIDTH_T + 1
+    };
     return tiles;
 }
 
-Position mTileToPos(int mTile, Scene* scene) {
-    int metaY = mTile / scene->sceneData.mapWInMtiles;
-    int metaX = mTile & (scene->sceneData.mapWInMtiles - 1);
+/** gives the four tiles comprising a metatile based on the flat tilemapping in ROM */
+inline MtTileArray sEIndexToMtTileArrayFlat(u32 sEIndex, Scene* scene) {
+    MtTileArray tiles = {
+        .t0 = sEIndex,
+        .t1 = sEIndex + 1,
+        .t2 = sEIndex + scene->sceneData.mapWInMtiles * 2,
+        .t3 = sEIndex + scene->sceneData.mapWInMtiles * 2 + 1
+    };
+    return tiles;
+}
+
+Position mTileToPos(u32 mTile, Scene* scene) {
+    u32 metaY = mTile / scene->sceneData.mapWInMtiles;
+    u32 metaX = mTile & (scene->sceneData.mapWInMtiles - 1);
     Position pos = { .x = {(metaX * 16) << 16}, .y = {(metaY * 16) << 16} };
     return pos;
 }
@@ -29,9 +44,9 @@ inline int coordToMtile(Position pos, Scene* scene) {
 }
 
 /** Returns the screen entry index of the first tile of the supplied metatile */
-u32 mTileToSEIndex(int mTile, Scene* scene) {
-    int metaY = mTile / scene->sceneData.mapWInMtiles;
-    int metaX = mTile & (scene->sceneData.mapWInMtiles - 1);
+u32 mTileToSEIndex(u32 mTile, Scene* scene) {
+    u32 metaY = mTile / scene->sceneData.mapWInMtiles;
+    u32 metaX = mTile & (scene->sceneData.mapWInMtiles - 1);
     u32 ty = metaY * 2, tx = metaX * 2;
     u32 sbb = (ty / SBB_WIDTH_T) * scene->sceneData.mapWInMtiles / SBB_WIDTH_MT +
         tx / SBB_WIDTH_T;
@@ -39,11 +54,24 @@ u32 mTileToSEIndex(int mTile, Scene* scene) {
 }
 
 /** Returns the screen entry index of the first tile of the supplied metatile. Assumes we are in SBB 0 */
-u32 mTileToSEIndexFast(int metatile, Scene* scene) {
+u32 mTileToSEIndexFast(u32 metatile, Scene* scene) {
     int metaY = metatile / scene->sceneData.mapWInMtiles;
     int metaX = metatile & (scene->sceneData.mapWInMtiles - 1);
     u32 ty = metaY * 2, tx = metaX * 2;
     return (ty & (SBB_WIDTH_T - 1)) * SBB_WIDTH_T + (tx & (SBB_WIDTH_T - 1));
+}
+
+// ignores SBBs
+u32 mTileToSEIndexFlat(u32 metatile, Scene* scene) {
+    u32 metaY = metatile / scene->sceneData.mapWInMtiles;
+    u32 metaX = metatile & (scene->sceneData.mapWInMtiles - 1);
+    u32 ty = metaY * 2, tx = metaX * 2;
+    return ty * (scene->sceneData.mapWInMtiles * 2) + tx;
+}
+
+MtTileArray mTileToMtTileArrayFlat(u32 metatile, Scene* scene) {
+    u32 sEIndex = mTileToSEIndexFlat(metatile, scene);
+    return sEIndexToMtTileArrayFlat(sEIndex, scene);
 }
 
 u32 coordToSeIndex(Position pos, Scene* scene) {
@@ -158,10 +186,18 @@ void updateActionTile(TreeNode* node) {
     }
 }
 
-void drawMTile(int sEIndex, int tileMemIndex, int pal) {
-    MtTileArray mTile = sEIndexToMTiles(sEIndex, scene);
-    se_mem[MAP_SBB][mTile.t0] = SE_BUILD(tileMemIndex, pal, 0, 0);
-    se_mem[MAP_SBB][mTile.t1] = SE_BUILD(tileMemIndex, pal, 1, 0);
-    se_mem[MAP_SBB][mTile.t2] = SE_BUILD(tileMemIndex, pal, 0, 1);
-    se_mem[MAP_SBB][mTile.t3] = SE_BUILD(tileMemIndex, pal, 1, 1);
+void drawMTile(u32 sEIndex, u32 tileMemIndex, int pb) {
+    MtTileArray vramMtile = sEIndexToMtTileArraySBB(sEIndex);
+    se_mem[MAP_SBB][vramMtile.t0] = SE_BUILD(tileMemIndex, pb, 0, 0);
+    se_mem[MAP_SBB][vramMtile.t1] = SE_BUILD(tileMemIndex, pb, 1, 0);
+    se_mem[MAP_SBB][vramMtile.t2] = SE_BUILD(tileMemIndex, pb, 0, 1);
+    se_mem[MAP_SBB][vramMtile.t3] = SE_BUILD(tileMemIndex, pb, 1, 1);
+}
+
+void drawMTileFromRom(u32 dstSEIndex, MtTileArray srcMtTileArray) {
+    MtTileArray vramMtile = sEIndexToMtTileArraySBB(dstSEIndex);
+    se_mem[MAP_SBB][vramMtile.t0] = scene->sceneData.sourceMap[srcMtTileArray.t0];
+    se_mem[MAP_SBB][vramMtile.t1] = scene->sceneData.sourceMap[srcMtTileArray.t1];
+    se_mem[MAP_SBB][vramMtile.t2] = scene->sceneData.sourceMap[srcMtTileArray.t2];
+    se_mem[MAP_SBB][vramMtile.t3] = scene->sceneData.sourceMap[srcMtTileArray.t3];
 }
