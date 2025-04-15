@@ -38,10 +38,11 @@
 /** Screen base block for map layer */
 #define MAP_SBB             31
 
-#define CROSSHAIRS_X_MIN    16
-#define CROSSHAIRS_X_MAX    SCR_W - 16
-#define CROSSHAIRS_Y_MIN    16
-#define CROSSHAIRS_Y_MAX    SCR_H - 16
+#define CROSSHAIRS_X_MIN    8
+#define CROSSHAIRS_X_MAX    SCR_W - 8
+#define CROSSHAIRS_Y_MIN    8
+#define CROSSHAIRS_Y_MAX    SCR_H - 8
+#define CROSSHAIRS_SPEED    0x1C000
 
 #define SPIN_WAIT_FRAMES    12
 #define NUM_SPINPUTS        9

@@ -30,9 +30,14 @@ void handleInput() {
         player->animFrames = 0;
     }
 
-    crosshairPos.x.HALF.HI += key_tri_horz();
-    crosshairPos.y.HALF.HI += key_tri_vert();
-    player->angle -= 0x300 * key_tri_shoulder();
+    if (dPadDir != STATIONARY) {
+        crosshairPos.x.WORD += getNextDiffX(crosshairPos.x.WORD,
+            (SWord)(CROSSHAIRS_SPEED + (0x100 * key_is_down(KEY_L))), dPadDir);
+        crosshairPos.y.WORD += getNextDiffY(crosshairPos.y.WORD,
+            (SWord)(CROSSHAIRS_SPEED + (0x100 * key_is_down(KEY_L))), dPadDir);
+    }
+    player->angle = ArcTan2((crosshairPos.x.HALF.HI + scene->screenX) - player->position.x.HALF.HI,
+        player->position.y.HALF.HI - (crosshairPos.y.HALF.HI + scene->screenY));
     speed.WORD = decaySpeed(speed, radius);
 
     // update affine stuff
@@ -61,7 +66,7 @@ void handleInput() {
             default: pushNewAttack(&crossAtk); break;
         }
     }
-    player->attacksActive->firing = key_is_down(KEY_B);
+    player->attacksActive->firing = KEY_DOWN_NOW(KEY_R) != 0;
 
     bool isSpinning = checkForSpin(dPadDir);
     if (isSpinning) pushNewAttack(&crossAtk);
@@ -73,13 +78,13 @@ void handleInput() {
     player->speed = speed;
 
     int nextId = NUM_SCENES;
-    if (player->position.x.HALF.HI < 8) {
+    if (player->position.x.HALF.HI < 16) {
         nextId = scene->sceneData.sceneId == 0 ? NUM_SCENES - 1 : scene->sceneData.sceneId - 1;
-        player->position.x.HALF.HI = sceneDataArr[nextId].mapWInMtiles * MT_WIDTH - 8;
+        player->position.x.HALF.HI = sceneDataArr[nextId].mapWInMtiles * MT_WIDTH - 16;
     }
-    else if (player->position.x.HALF.HI > scene->sceneData.mapWInMtiles * MT_WIDTH - 8) {
+    else if (player->position.x.HALF.HI > scene->sceneData.mapWInMtiles * MT_WIDTH - 16) {
         nextId = scene->sceneData.sceneId == NUM_SCENES - 1 ? 0 : scene->sceneData.sceneId + 1;
-        player->position.x.HALF.HI = 8;
+        player->position.x.HALF.HI = 16;
     }
     if (nextId != NUM_SCENES) {
         player->position.y.HALF.HI = clamp(player->position.y.HALF.HI, hBoxTOffset(hb),

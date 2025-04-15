@@ -56,17 +56,8 @@ enum ItemClass { // corresponds with atk array in attacks.c
 #define NUM_ITEMS   11
 
 enum ActionClass {
-    ACTION_ADD_ATK0,
-    ACTION_ADD_ATK1,
-    ACTION_ADD_ATK2,
-    ACTION_ADD_ATK3,
-    ACTION_ADD_ATK4,
-    ACTION_ADD_ATK5,
-    ACTION_ADD_ATK6,
-    ACTION_ADD_ATK7,
-    ACTION_ADD_ATK8,
-    ACTION_ADD_ATK9,
-    ACTION_ADD_ATK10,
+    ADD_ITEM = 14,
+    DO_ACTION = 15
 };
 
 enum AtkClass {
