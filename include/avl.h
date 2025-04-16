@@ -17,11 +17,13 @@ Node* balanceTree(Node* traversed);
 
 TreeNode* findTreeNode(TreeNode* head, int key);
 
-Node* traverseTree(Node* firstNode, int data, int* length);
+Node* traverseTree(Node* firstNode, int key, int* length);
+
+Node* traverseFind(Node* firstNode, int key);
 
 void deleteAllTreeNodes(TreeNode* head);
 
-void deleteTreeNode(TreeNode* head, int key);
+TreeNode* deleteTreeNode(TreeNode* head, int key);
 
 TreeNode* getNodeDataAsTreeNode(Node* node);
 

@@ -8,7 +8,7 @@
 
 // maximums (will change)
 #define PLAYER_MAX_RADIUS   0x30000
-#define PLAYER_DECAY_RATE   0x3000
+#define PLAYER_DECAY_RATE   0x1000
 #define MAX_ENTS            16
 #define NUM_SCENES          3
 #define ANGLE_MIN           0

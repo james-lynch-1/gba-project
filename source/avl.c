@@ -62,6 +62,7 @@ TreeNode* insertTreeNode(TreeNode* head, ActionTile tile) {
  *  Returns a pointer to the new subtree's root.
  */
 Node* balanceTree(Node* traversed) {
+    if (!traversed) return NULL;
     TreeNode* n = getNodeDataAsTreeNode(traversed);
     n->height = 1 + max(getHeight(n->left), getHeight(n->right));
     int balance = getBalance(n);
@@ -110,18 +111,37 @@ TreeNode* findTreeNode(TreeNode* head, int key) {
  *  add a new node of supplied value. Returns a generic Node* with data of type TreeNode* (cast from void*)
  *  and amends the supplied stack length. (If key is in tree, returns its TreeNode* (in Node* stack form))
 */
-Node* traverseTree(Node* firstNode, int tileIndex, int* length) {
+Node* traverseTree(Node* firstNode, int key, int* length) {
     if (!firstNode) return NULL;
     Node* stackPtr = firstNode;
     TreeNode* treeNode = (TreeNode*)(firstNode->data);
-    int l = *length;
+    int l = 0;
     do {
         if (!treeNode) break;
-        treeNode = tileIndex <= (treeNode->tile.id) ? treeNode->left : treeNode->right;
+        treeNode = key <= (treeNode->tile.id) ? treeNode->left : treeNode->right;
         stackPtr = stackPush(stackPtr, treeNode);
         l++;
     } while (treeNode);
-    *length = l - 1; // because stackPush fails on the last iteration
+    if (length) *length += l - 1; // because stackPush fails on the last iteration
+    return stackPtr;
+}
+
+/** Same as traverseTree, except it returns the stack with the node with specified key at the top.
+ *  Assumes key exists in tree.
+ */
+Node* traverseFind(Node* firstNode, int key) {
+    if (!firstNode) return NULL;
+    Node* stackPtr = firstNode;
+    TreeNode* treeNode = (TreeNode*)(firstNode->data);
+    do {
+        if (!treeNode) break;
+        if (key < treeNode->tile.id)
+            treeNode = treeNode->left;
+        else if (key > treeNode->tile.id)
+            treeNode = treeNode->right;
+        else break;
+        stackPtr = stackPush(stackPtr, treeNode);
+    } while (treeNode);
     return stackPtr;
 }
 
@@ -146,20 +166,82 @@ void deleteAllTreeNodes(TreeNode* head) {
     } while (traversed);
 }
 
-// must be leaf node... will change later
-void deleteTreeNode(TreeNode* head, int key) {
+/** Deletes a node from the tree and returns the head (may have changed) */
+TreeNode* deleteTreeNode(TreeNode* head, int key) {
+    if (!head) return NULL;
     Node* traversed = createStack((void*)head);
-    traversed = traverseTree(traversed, key, NULL);
-    TreeNode* node = getNodeDataAsTreeNode(traversed);
-    if (node && node->tile.id == key) {
+    traversed = traverseFind(traversed, key);
+    Node* node = traversed;
+    TreeNode* treeNode = getNodeDataAsTreeNode(traversed);
+    if (treeNode && treeNode->tile.id == key) {
         TreeNode* parent = getNodeDataAsTreeNode(traversed->next);
-        if (parent->tile.id > key)
-            parent->left = NULL;
-        else
-            parent->right = NULL;
-        free(node);
+        TreeNode* child;
+        if (!treeNode->left && !treeNode->right) { // case 1: leaf (simple)
+            if (parent) {
+                if (parent->tile.id > key)
+                    parent->left = NULL;
+                else
+                    parent->right = NULL;
+            }
+            traversed = pop(traversed);
+        }
+        else if (!treeNode->left ^ !treeNode->right) { // case 2: one child
+            // swap the node and its child
+            child = treeNode->left ? treeNode->left : treeNode->right;
+            if (parent) {
+                if (parent->tile.id > key)
+                    parent->left = child;
+                else
+                    parent->right = child;
+            }
+            traversed->data = child;
+        }
+        else { // case 3: two children
+            traversed = traverseTree(traversed, key + 1, NULL); // leftmost child of right subtree
+            TreeNode* succ = getNodeDataAsTreeNode(traversed);
+            TreeNode* succParent = getNodeDataAsTreeNode(traversed->next);
+            if (succParent == treeNode) { // special case: succ is right child of node to be deleted
+                if (parent) {
+                    if (parent->tile.id > succ->tile.id)
+                        parent->left = succ;
+                    else
+                        parent->right = succ;
+                }
+                succ->left = treeNode->left;
+
+                // update traversed stack
+                traversed = pop(traversed);
+                traversed->data = succ;
+            }
+            else {
+                succParent->left = succ->right;
+
+                // update traversed stack
+                traversed = pop(traversed);
+                node->data = succ;
+
+                if (parent) {
+                    if (parent->tile.id > succ->tile.id)
+                        parent->left = succ;
+                    else
+                        parent->right = succ;
+                }
+                succ->left = treeNode->left;
+                succ->right = treeNode->right;
+            }
+        }
+        free(treeNode);
+        if (traversed) {
+            while (traversed->next) {
+                traversed = balanceTree(traversed);
+                traversed = pop(traversed);
+            }
+        }
+        traversed = balanceTree(traversed);
+        head = getNodeDataAsTreeNode(traversed);
+        deleteStack(traversed);
     }
-    deleteStack(traversed);
+    return head;
 }
 
 TreeNode* getNodeDataAsTreeNode(Node* node) {

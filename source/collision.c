@@ -212,9 +212,9 @@ u32 handleItemTileColl(Position pos, u32 tileColl) {
     void* collMap = (void*)scene->sceneData.sourceCollisionMap;
     int originalCollision = getPointCollFns[scene->sceneData.mapWInMtiles / 16 - 1](pos, collMap);
     TreeNode restoreNode = { NULL, NULL, {node->tile.id, {0, originalCollision, 0}} };
-    addActionTileToCollMap(scene, &restoreNode); // restore original collision
     drawMTileFromRom(seIndex, srcMtTileArray); // restore original tile
-    node->timer = 0;
+    addActionTileToCollMap(scene, &restoreNode); // restore original collision
+    scene->actionTileTree = deleteTreeNode(scene->actionTileTree, node->tile.id);
     return 0;
 }
 
