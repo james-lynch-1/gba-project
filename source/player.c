@@ -147,7 +147,7 @@ void updateAttacks() {
         atkUpdateFns[atkInst->attack->atkClass](atkInst);
         atkInst = atkInst->next;
     }
-    entities->attacksActive->toBeDeleted = 0; // can't delete the first attack
+    if (entities->attacksActive) entities->attacksActive->toBeDeleted = 0; // can't delete the first attack
 }
 
 // checks for series of inputs resulting in a spin
