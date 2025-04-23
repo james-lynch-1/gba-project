@@ -1,13 +1,4 @@
 #include "initialise.h"
-#include "scene.h"
-#include "entity.h"
-#include "graphics/graphics.h"
-
-extern OBJ_ATTR obj_buffer[128];
-extern OBJ_AFFINE* obj_aff_buffer;
-extern Entity* entities;
-extern Scene* scene;
-extern u16 numEnts;
 
 void initialise() {
     irq_init(NULL);

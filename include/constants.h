@@ -10,7 +10,7 @@
 #define PLAYER_MAX_RADIUS   0x30000
 #define PLAYER_DECAY_RATE   0x1000
 #define MAX_ENTS            16
-#define NUM_SCENES          3
+#define NUM_SCENES          4
 #define ANGLE_MIN           0
 #define ANGLE_MAX           65535
 /** Player sprite width, in pixels */

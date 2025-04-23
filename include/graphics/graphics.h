@@ -2,6 +2,7 @@
 #include "graphics/maps/grasslandMeta.h"
 #include "graphics/maps/home.h"
 #include "graphics/maps/uglybig.h"
+#include "graphics/maps/ramp.h"
 
 #include "graphics/maps/atkIcons.h"
 #include "graphics/maps/crosshairs.h"

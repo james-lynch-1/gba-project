@@ -1,31 +1,33 @@
-#include "global.h"
-
-u32 frameCount = 0;
-
-OBJ_ATTR obj_buffer[MAX_ENTS];
-OBJ_AFFINE* obj_aff_buffer = (OBJ_AFFINE*)obj_buffer;
-Entity* entities;
-Scene* scene = NULL;
-Viewport vp = {0, 0, 0, 0, 0, 0};
-Direction dPadDir = STATIONARY;
-int numEnts = 0;
-int numAttacks = 0; // not including basic attack
-Position crosshairPos = {.x.WORD = 8 << 16, .y.WORD = 8 << 16};
+#include "main.h"
 
 int main() {
 	initialise();
 	while (1) {
-		VBlankIntrWait();
-		handleInput();
-		updateAttacks();
-		handleScroll();
-		updateEnts();
-		updateActionTiles(scene);
-		updateCrosshair();
-
-		oam_copy(oam_mem, obj_buffer, 128);
-		frameCount++;
+		updateGameFns[state]();
 	}
 
 	return 0;
 }
+
+void updateGameNormal() {
+    handleInput();
+    VBlankIntrWait();
+    updateAttacks();
+    handleScroll();
+    updateEnts();
+    updateActionTiles();
+    updateCrosshair();
+
+    oam_copy(oam_mem, obj_buffer, 128);
+    frameCount++;
+}
+
+void updateGameTitle() {
+    VBlankIntrWait();
+	handleInputTitle();
+}
+
+void (* const updateGameFns[])() = {
+    updateGameNormal,
+    updateGameTitle
+};

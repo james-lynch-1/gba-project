@@ -28,6 +28,13 @@ const struct SceneData sceneDataArr[NUM_SCENES] = { {
     .actionTileArray = NULL,
     .mapWInMtiles = 64,
     .mapHInMtiles = 64
+}, {
+    .sceneId = Ramp,
+    .sourceMap = rampMap,
+    .sourceCollisionMap = rampColl,
+    .actionTileArray = NULL,
+    .mapWInMtiles = 16,
+    .mapHInMtiles = 16
 } };
 
 void loadScene(Scene* scene, SceneEnum sceneName) {
@@ -96,6 +103,14 @@ void loadScene(Scene* scene, SceneEnum sceneName) {
                 uglybigPal, uglybigPalLen,
                 uglybigTiles, uglybigTilesLen,
                 uglybigMap, uglybigMapLen,
+                scene
+            );
+            break;
+        case Ramp:
+            loadBG(
+                rampPal, rampPalLen,
+                rampTiles, rampTilesLen,
+                rampMap, rampMapLen,
                 scene
             );
             break;

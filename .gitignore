@@ -4,3 +4,4 @@ build/
 *.elf
 tiled-project/
 /graphics/
+.VSCodeCounter/

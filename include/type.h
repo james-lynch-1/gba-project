@@ -22,6 +22,11 @@
 #define CORNER_COLL_MASK    0x00F0FF0Fu
 #define COLL_MASK           0xFFFFFFFFu
 
+enum State {
+    NORMAL,
+    TITLE
+};
+
 typedef enum {
     CHAR,
     DIRECTION,
@@ -206,7 +211,8 @@ typedef enum {
 typedef enum SceneEnum_ {
     Grassland = 0,
     Home = 1,
-    Uglybig = 2
+    Uglybig = 2,
+    Ramp = 3
 } SceneEnum;
 
 struct SceneData {

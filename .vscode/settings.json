@@ -54,7 +54,10 @@
         "player.h": "c",
         "queue.h": "c",
         "uglybig.h": "c",
-        "hitbox.h": "c"
+        "hitbox.h": "c",
+        "title.h": "c",
+        "main.h": "c",
+        "ramp.h": "c"
     },
     "VSCodeCounter.exclude": [
         "**/.gitignore",
@@ -63,9 +66,13 @@
         "**/graphics",
         "**/build",
         "**/Makefile",
-        "**/include/graphics"
+        "**/include/graphics",
+        "**/grassland.c",
+        "**/home.c",
+        "**/uglybig.c"
     ],
     "VSCodeCounter.languages": {
         
-    }
+    },
+    "workbench.editor.empty.hint": "hidden"
 }
