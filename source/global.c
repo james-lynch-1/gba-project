@@ -12,6 +12,5 @@ Scene* scene = NULL;
 Viewport vp = { 0, 0, 0, 0, 0, 0 };
 Direction dPadDir = STATIONARY;
 int numEnts = 0;
-int numEntsOnScreen = 0; // not including player
 int numAttacks = 0; // not including basic attack
 Position crosshairPos = { .x.WORD = 8 << 16, .y.WORD = 8 << 16 };

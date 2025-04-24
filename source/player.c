@@ -1,14 +1,5 @@
-#include <tonc.h>
 #include "player.h"
 #include "log.h"
-
-extern Entity* entities;
-extern Scene* scene;
-extern int numEnts;
-extern int numAttacks;
-extern u32 frameCount;
-extern Position crosshairPos;
-extern Direction dPadDir;
 
 void handleInput() {
     Entity* player = entities;
@@ -53,18 +44,19 @@ void handleInput() {
         return;
     }
     if (key_hit(KEY_START)) {
-        switch (key_is_down(KEY_RIGHT) + key_is_down(KEY_DOWN) +
-            key_is_down(KEY_LEFT) + key_is_down(KEY_UP)) {
-            case 0x10: pushNewAttack(&eastAtk); break;
-            case 0x80: pushNewAttack(&southAtk); break;
-            case 0x20: pushNewAttack(&westAtk); break;
-            case 0x40: pushNewAttack(&northAtk); break;
-            case 0x90: pushNewAttack(&southeastAtk); break;
-            case 0xA0: pushNewAttack(&southwestAtk); break;
-            case 0x60: pushNewAttack(&northwestAtk); break;
-            case 0x50: pushNewAttack(&northeastAtk); break;
-            default: pushNewAttack(&crossAtk); break;
-        }
+        // switch (key_is_down(KEY_RIGHT) + key_is_down(KEY_DOWN) +
+        //     key_is_down(KEY_LEFT) + key_is_down(KEY_UP)) {
+        //     case 0x10: pushNewAttack(&eastAtk); break;
+        //     case 0x80: pushNewAttack(&southAtk); break;
+        //     case 0x20: pushNewAttack(&westAtk); break;
+        //     case 0x40: pushNewAttack(&northAtk); break;
+        //     case 0x90: pushNewAttack(&southeastAtk); break;
+        //     case 0xA0: pushNewAttack(&southwestAtk); break;
+        //     case 0x60: pushNewAttack(&northwestAtk); break;
+        //     case 0x50: pushNewAttack(&northeastAtk); break;
+        //     default: pushNewAttack(&crossAtk); break;
+        // }
+        spawnFella(screenToWorldPos(crosshairPos));
     }
     player->attacksActive->firing = KEY_DOWN_NOW(KEY_R) != 0;
 

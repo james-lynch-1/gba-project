@@ -216,10 +216,10 @@ typedef enum SceneEnum_ {
 } SceneEnum;
 
 struct SceneData {
-    SceneEnum sceneId;
     const SCR_ENTRY* sourceMap;
     const void* sourceCollisionMap;
     ActionTile* actionTileArray;
+    SceneEnum sceneId;
     u8 mapWInMtiles;
     u8 mapHInMtiles;
 };

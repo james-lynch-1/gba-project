@@ -15,7 +15,6 @@ extern Scene* scene;
 extern Viewport vp;
 extern Direction dPadDir;
 extern int numEnts;
-extern int numEntsOnScreen;
 extern int numAttacks; // not including basic attack
 extern Position crosshairPos;
 

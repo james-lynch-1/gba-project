@@ -41,6 +41,8 @@ int hBoxBOffset(Hitbox hitbox);
 int hBoxXOffset(Hitbox hitbox);
 int hBoxYOffset(Hitbox hitbox);
 
+Position screenToWorldPos(Position pos);
+
 // collision
 u32 getPointCollision256x256(Position pos, void* collisionMap);
 u32 getPointCollision512x512(Position pos, void* collisionMap);

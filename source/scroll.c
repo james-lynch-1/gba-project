@@ -1,9 +1,5 @@
 #include "scene.h"
 
-extern Entity* entities;
-extern Scene* scene;
-extern Viewport vp;
-
 void handleScroll() {
     Entity* player = entities;
     moveViewportOnMap(player, scene);

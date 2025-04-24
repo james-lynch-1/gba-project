@@ -1,12 +1,6 @@
 #include "ui.h"
 #include "graphics/graphics.h"
 
-extern OBJ_ATTR obj_buffer[128];
-extern OBJ_AFFINE* obj_aff_buffer;
-extern Entity* entities;
-extern Position crosshairPos;
-extern int numAttacks;
-
 void (* const updateUiFns[])(AttackInstance* atkInst, int atkNum) = {
     updateBasicAttackUI, updateQuadCountdownUI
 };

@@ -1,13 +1,9 @@
-
 #include "type.h"
 #include "tile.h"
 #include "log.h"
-#include "graphics/maps/grassland.h"
 #include "attacks.h"
 #include "entity.h"
-
-extern Entity* entities;
-extern Scene* scene;
+#include "global.h"
 
 // 0: empty, 1: filled, 2: nw, 3: ne, 4: sw, 5: se, 6: 3/8e, 7: 3/8 w, 8: 3/8 s, 9: 3/8 n
 TileCollArray TileCollArrays[16] = {

@@ -1,14 +1,6 @@
 #include "entity.h"
 #include "log.h"
-
-extern OBJ_ATTR obj_buffer[128];
-extern OBJ_AFFINE* obj_aff_buffer;
-extern Entity* entities;
-extern Scene* scene;
-extern int numEnts;
-extern Position crosshairPos;
-extern int numAttacks;
-extern u32 frameCount;
+#include "global.h"
 
 Entity* loadPlayer() {
     Entity* entities = malloc(sizeof(Entity));
@@ -98,9 +90,9 @@ void spawnFella(Position pos) {
 
 /** Updates animation frames, affine data (TBC), positions on screen, health */
 void updateEnts() {
-    Position crosshairWorldPos = { .x.HALF.HI = crosshairPos.x.HALF.HI + scene->screenX,
-                                   .y.HALF.HI = crosshairPos.y.HALF.HI + scene->screenY };
+    Position crosshairWorldPos = screenToWorldPos(crosshairPos);
     Entity* currEnt = entities->next; // not updating the player, handled elsewhere
+    int numEntsOnScreen = 2;
     while (currEnt != NULL) {
         Entity* next = currEnt->next;
         if (currEnt->toBeDeleted) {
@@ -110,24 +102,23 @@ void updateEnts() {
         else {
             bool onScreen = checkIfOnScreen(currEnt);
             if (onScreen) {
+                currEnt->obj = &obj_buffer[numEntsOnScreen++];
                 u8 prevAnimState = currEnt->animationState;
-                currEnt->obj->attr0 &= ~ATTR0_HIDE;
                 Position offset = { {0}, {0} };
                 currEnt->moveSprite(currEnt, offset);
                 int crosshairEntColl = checkCrosshairEntColl(currEnt, crosshairWorldPos);
                 handlePlayerAttacks(currEnt, crosshairEntColl);
                 updateAnimation(currEnt, prevAnimState);
-                if (!entities->invincibleTime) {
-                    if (checkPlayerEntCollision(entities, currEnt)) doPlayerKnockback(currEnt);
-                }
+                if (!entities->invincibleTime && checkPlayerEntCollision(entities, currEnt))
+                    doPlayerKnockback(currEnt);
             }
-            else currEnt->obj->attr0 |= ATTR0_HIDE;
-            if (currEnt->health <= 0) {
+            if (currEnt->health <= 0)
                 currEnt->toBeDeleted = 1;
-            }
             currEnt = next;
         }
     }
+    for (int i = numEntsOnScreen; i < 128; i++)
+        obj_set_attr(&obj_buffer[i], 0, 0, 0);
 }
 
 void markAllEntsToBeDeleted() {
@@ -276,4 +267,9 @@ int hBoxXOffset(Hitbox hb) {
 
 int hBoxYOffset(Hitbox hb) {
     return hb.yOffset;
+}
+
+Position screenToWorldPos(Position pos) {
+    Position worldPos = { {(pos.x.HALF.HI + vp.x) << 16}, {(pos.y.HALF.HI + vp.y) << 16} };
+    return worldPos;
 }

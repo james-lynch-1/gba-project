@@ -1,10 +1,11 @@
 #ifndef uih
 #define uih
 
+#include <tonc.h>
 #include "entity.h"
 #include "type.h"
 #include "constants.h"
-#include <tonc.h>
+#include "global.h"
 
 extern void (* const updateUiFns[])(AttackInstance* atkInst, int atkNum);
 

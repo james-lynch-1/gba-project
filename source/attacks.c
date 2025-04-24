@@ -1,8 +1,5 @@
 #include "attacks.h"
 
-extern Entity* entities;
-extern int numAttacks;
-
 // attack functions
 // array indices correspond to attack class enums
 void (* const beAtkdFns[])(Entity* ent, u8 attackRangeValue) = { beAttackedDirect, beAttackedSpecial };

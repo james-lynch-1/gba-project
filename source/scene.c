@@ -1,11 +1,4 @@
-#include "type.h"
 #include "scene.h"
-#include "graphics/graphics.h"
-
-extern Entity* entities;
-extern Scene* scene;
-extern u16 numEnts;
-extern Viewport vp;
 
 const struct SceneData sceneDataArr[NUM_SCENES] = { {
     .sceneId = Grassland,

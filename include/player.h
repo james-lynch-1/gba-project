@@ -1,11 +1,13 @@
 #ifndef playerh
 #define playerh
 
+#include <tonc.h>
 #include "entity.h"
 #include "scene.h"
 #include "initialise.h"
 #include "type.h"
 #include "constants.h"
+#include "global.h"
 
 void handleInput();
 Direction getDir(int direction[2], Direction dir);

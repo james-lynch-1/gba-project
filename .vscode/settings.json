@@ -57,7 +57,9 @@
         "hitbox.h": "c",
         "title.h": "c",
         "main.h": "c",
-        "ramp.h": "c"
+        "ramp.h": "c",
+        "glob.h": "c",
+        "avl.h": "c"
     },
     "VSCodeCounter.exclude": [
         "**/.gitignore",

@@ -5,6 +5,7 @@
 #include "log.h"
 #include "type.h"
 #include "constants.h"
+#include "global.h"
 
 extern const Attack basicAtk;
 extern const Attack screenAtk;
