@@ -277,19 +277,19 @@ u32 getEdgeCollision(Position pos, Hitbox hb, Direction cardDir, Scene* scene) {
 
 // To fix diagonal collisions (make them less sticky)
 int getAngleOffset(u16 angle, int tileClass) {
-    int offset;
+    int offset = 0;
     switch (tileClass) {
         case T_NW_FILLED:
-            offset = (int)angle - 0x6000;
+            if (in_range(angle, 0x2000, 0xA000)) offset = (int)angle - 0x6000;
             break;
         case T_NE_FILLED:
-            offset = (int)angle - 0x2000;
+            if (in_range((u16)(angle += 0x2000), 0, 0x8000)) offset = (int)angle - 0x4000;
             break;
         case T_SW_FILLED:
-            offset = (int)angle - 0xA000;
+            if (in_range(angle, 0x6000, 0xE000)) offset = (int)angle - 0xA000;
             break;
         case T_SE_FILLED:
-            offset = (int)angle - 0xE000;
+            if (in_range((u16)(angle += 0x6000), 0, 0x8000)) offset = (int)angle - 0x4000;
             break;
         default:
             return 0;

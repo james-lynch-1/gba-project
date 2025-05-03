@@ -7,7 +7,6 @@ void handleInput() {
     SWord speed = player->speed;
     u8 prevAnimState = player->animationState;
     Hitbox hb = player->hitbox;
-    player->collision = 0;
     key_poll();
 
     if (player->invincibleTime) player->invincibleTime--;
@@ -66,17 +65,17 @@ void handleInput() {
     crosshairPos.x.WORD = clamp(crosshairPos.x.WORD, CROSSHAIRS_X_MIN << 16, (CROSSHAIRS_X_MAX) << 16);
     crosshairPos.y.WORD = clamp(crosshairPos.y.WORD, CROSSHAIRS_Y_MIN << 16, (CROSSHAIRS_Y_MAX) << 16);
 
-    Position nextPos = getNextPosition(player);
-    player->position = nextPos;
-    player->speed = speed;
     player->angleOffset = 0;
     int cornerMaskOffsets[4] = { 0, 8, 12, 20 };
     int i = 0;
     while (player->angleOffset == 0 && i < 4)
         player->angleOffset = getAngleOffset(player->angle, (player->collision >> cornerMaskOffsets[i++]) & 0xF);
-    log(INT, player->angleOffset);
-    // log(U32HEX, player->collision);
-    
+
+    player->collision = 0;
+    Position nextPos = getNextPosition(player);
+    player->position = nextPos;
+    player->speed = speed;
+
     int nextId = NUM_SCENES;
     if (player->position.x.HALF.HI < 16) {
         nextId = scene->sceneData.sceneId == 0 ? NUM_SCENES - 1 : scene->sceneData.sceneId - 1;
