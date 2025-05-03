@@ -50,6 +50,8 @@ u32 getPointCollision1024x1024(Position pos, void* collisionMap);
 u32 getEdgePointCollision(Position nextPos, Hitbox hb, Direction dir, Scene* scene);
 u32 getEdgeCollision(Position pos, Hitbox hb, Direction cardDir, Scene* scene);
 
+int getAngleOffset(u16 angle, int tileClass);
+
 u32 getInTilePointColl(Position pos, u32 tileColl);
 u32 handleItemTileColl(Position pos, u32 tileColl);
 int doAction(int actionTileId);

@@ -7,6 +7,7 @@ void handleInput() {
     SWord speed = player->speed;
     u8 prevAnimState = player->animationState;
     Hitbox hb = player->hitbox;
+    player->collision = 0;
     key_poll();
 
     if (player->invincibleTime) player->invincibleTime--;
@@ -68,7 +69,14 @@ void handleInput() {
     Position nextPos = getNextPosition(player);
     player->position = nextPos;
     player->speed = speed;
-
+    player->angleOffset = 0;
+    int cornerMaskOffsets[4] = { 0, 8, 12, 20 };
+    int i = 0;
+    while (player->angleOffset == 0 && i < 4)
+        player->angleOffset = getAngleOffset(player->angle, (player->collision >> cornerMaskOffsets[i++]) & 0xF);
+    log(INT, player->angleOffset);
+    // log(U32HEX, player->collision);
+    
     int nextId = NUM_SCENES;
     if (player->position.x.HALF.HI < 16) {
         nextId = scene->sceneData.sceneId == 0 ? NUM_SCENES - 1 : scene->sceneData.sceneId - 1;
@@ -112,7 +120,7 @@ Position getNextPosition(Entity* player) {
 }
 
 void updateEntityAffine(Entity* player) {
-    obj_aff_rotscale(player->obj_aff, 256, 256, player->angle + player->angleOffset);
+    obj_aff_rotscale(player->obj_aff, 256, 256, player->angle + player->angleVisual);
     obj_aff_copy(obj_aff_mem, player->obj_aff, 1);
 }
 
@@ -224,7 +232,7 @@ u16 getAngle(Direction dir, u32 angle) {
 
 /** Finds closest possible position to the wall the ent is colliding with on the x axis. */
 SWord handleCollisionX(Entity* ent) {
-    u32 angle = ent->angle;
+    u32 angle = ent->angle + ent->angleOffset;
     SWord speed = ent->speed, speedTest = { 0 };
     Direction xDir = (EAST + !anglePositiveX(angle) * 0x8000) & 0xFFFF;
     Position pos = ent->position, posArr[2] = { pos, pos }; // nextPos, nextNextPos
@@ -234,13 +242,14 @@ SWord handleCollisionX(Entity* ent) {
         speedTest.WORD = clamp(speedTest.WORD + 0x10000, 0, speed.WORD + 1);
         posArr[1].x.WORD = pos.x.WORD + getNextDiffX(pos.x.WORD, speedTest, angle);
         coll = getEdgeCollision(posArr[1], ent->hitbox, xDir, scene);
+        if (speedTest.HALF.HI == 1) ent->collision |= coll;
     } while (coll == 0 && speedTest.WORD < speed.WORD);
     return posArr[coll == 0].x;
 }
 
 /** Finds closest possible position to the wall the ent is colliding with on the y axis. */
 SWord handleCollisionY(Entity* ent) {
-    u32 angle = ent->angle;
+    u32 angle = ent->angle + ent->angleOffset;
     SWord speed = ent->speed, speedTest = { 0 };
     Direction yDir = (NORTH + !anglePositiveY(angle) * 0x8000) & 0xFFFF;
     Position pos = ent->position, posArr[2] = { pos, pos }; // nextPos, nextNextPos
@@ -250,6 +259,7 @@ SWord handleCollisionY(Entity* ent) {
         speedTest.WORD = clamp(speedTest.WORD + 0x10000, 0, speed.WORD + 1);
         posArr[1].y.WORD = pos.y.WORD + getNextDiffY(pos.y.WORD, speedTest, angle);
         coll = getEdgeCollision(posArr[1], ent->hitbox, yDir, scene);
+        if (speedTest.HALF.HI == 1) ent->collision |= coll;
     } while (coll == 0 && speedTest.WORD < speed.WORD);
     return posArr[coll == 0].y;
 }

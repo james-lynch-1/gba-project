@@ -178,6 +178,13 @@ TileCollArray TileCollArrays[16] = {
     {},
 };
 
+u32(* const getPointCollFns[])(Position pos, void* collisionMap) = {
+    getPointCollision256x256,
+    getPointCollision512x512,
+    NULL,
+    getPointCollision1024x1024
+};
+
 u32(* const handlePointCollFns[])(Position pos, u32 tileColl) = {
     getInTilePointColl,
     getInTilePointColl,
@@ -198,7 +205,7 @@ u32(* const handlePointCollFns[])(Position pos, u32 tileColl) = {
 };
 
 u32 getInTilePointColl(Position pos, u32 tileColl) {
-    return (TileCollArrays[tileColl].row[pos.y.HALF.HI & 15] & (1 << (pos.x.HALF.HI & 15))) != 0;
+    return ((TileCollArrays[tileColl].row[pos.y.HALF.HI & 15] & (1 << (pos.x.HALF.HI & 15))) != 0) * tileColl;
 }
 
 u32 handleItemTileColl(Position pos, u32 tileColl) {
@@ -226,13 +233,6 @@ u32 handleActionTileColl(Position pos, u32 tileColl) {
     int mTile = coordToMtile(pos, scene);
     return doAction(mTile);
 }
-
-u32(* const getPointCollFns[])(Position pos, void* collisionMap) = {
-    getPointCollision256x256,
-    getPointCollision512x512,
-    NULL,
-    getPointCollision1024x1024
-};
 
 u32 getPointCollision256x256(Position pos, void* collisionMap) {
     CollisionTileRow256x256* sglCollRowPtr = (CollisionTileRow256x256*)collisionMap;
@@ -273,4 +273,26 @@ u32 getEdgeCollision(Position pos, Hitbox hb, Direction cardDir, Scene* scene) {
         pointDir = (pointDir + 0x2000) & 0xFFFF;
     }
     return edgeCollision;
+}
+
+// To fix diagonal collisions (make them less sticky)
+int getAngleOffset(u16 angle, int tileClass) {
+    int offset;
+    switch (tileClass) {
+        case T_NW_FILLED:
+            offset = (int)angle - 0x6000;
+            break;
+        case T_NE_FILLED:
+            offset = (int)angle - 0x2000;
+            break;
+        case T_SW_FILLED:
+            offset = (int)angle - 0xA000;
+            break;
+        case T_SE_FILLED:
+            offset = (int)angle - 0xE000;
+            break;
+        default:
+            return 0;
+    }
+    return (offset + SGN(offset) * 0x4000) / 2;
 }

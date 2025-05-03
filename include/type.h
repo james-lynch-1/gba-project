@@ -281,15 +281,17 @@ typedef struct Entity_ {
     OBJ_AFFINE* obj_aff; // 4 bytes
 
     // important
-    void (*moveSprite)(struct Entity_* ent, Position offset); // 4 bytes
-    int health; // 4 bytes
     Position position; // 8 bytes
     Hitbox hitbox; // 8 bytes
+    void (*moveSprite)(struct Entity_* ent, Position offset); // 4 bytes
+    int health; // 4 bytes
     AttackInstance* attacksActive; // 4 bytes
     SWord radius; // 4 bytes. Top speed
     SWord speed; // 4 bytes. scalar value
-    u16 angleOffset; // 2 bytes
+    u32 collision; // 4 bytes
+    int angleOffset; // 4 bytes
     u16 angle; // 2 bytes
+    u16 angleVisual; // 2 bytes
     u16 tid; // 2 bytes
     u16 remoteControlCountdown; // 2 bytes. No. of frames before control is handed back to the player. 65535 means indefinite
     u8 affIndex; // 1 byte
