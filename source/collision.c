@@ -294,5 +294,5 @@ int getAngleOffset(u16 angle, int tileClass) {
         default:
             return 0;
     }
-    return (offset + SGN(offset) * 0x4000) / 2;
+    return (offset + SGN3(offset) * 0x4000) / 2;
 }
