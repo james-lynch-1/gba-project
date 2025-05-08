@@ -59,7 +59,8 @@
         "main.h": "c",
         "ramp.h": "c",
         "glob.h": "c",
-        "avl.h": "c"
+        "avl.h": "c",
+        "pause.h": "c"
     },
     "VSCodeCounter.exclude": [
         "**/.gitignore",

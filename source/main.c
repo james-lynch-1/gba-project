@@ -1,12 +1,13 @@
 #include "main.h"
+#include "global.h"
 
 int main() {
-	initialise();
-	while (1) {
-		updateGameFns[state]();
-	}
-
-	return 0;
+    initialise();
+    while (1) {
+        gameState.updateFunction();
+        frameCount++;
+    }
+    return 0;
 }
 
 void updateGameNormal() {
@@ -17,17 +18,27 @@ void updateGameNormal() {
     updateEnts();
     updateActionTiles();
     updateCrosshair();
-
     oam_copy(oam_mem, obj_buffer, 128);
-    frameCount++;
 }
 
 void updateGameTitle() {
+    handleInputTitle();
     VBlankIntrWait();
-	handleInputTitle();
+    updateAttacks();
+    handleScroll();
+    updateEnts();
+    updateActionTiles();
+    updateCrosshair();
+    oam_copy(oam_mem, obj_buffer, 128);
 }
 
-void (* const updateGameFns[])() = {
-    updateGameNormal,
-    updateGameTitle
-};
+void updateGamePause() {
+    handleInputPause();
+    VBlankIntrWait();
+    
+    oam_copy(oam_mem, obj_buffer, 128);
+}
+
+void doNothing() {
+    log(CHAR, "doing nothing");
+}

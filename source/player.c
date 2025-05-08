@@ -23,9 +23,9 @@ void handleInput() {
 
     if (dPadDir != STATIONARY) {
         crosshairPos.x.WORD += getNextDiffX(crosshairPos.x.WORD,
-            (SWord)(CROSSHAIRS_SPEED + (0x100 * key_is_down(KEY_L))), dPadDir);
+            (SWord)(CROSSHAIRS_SPEED >> (key_is_down(KEY_L) != 0)), dPadDir);
         crosshairPos.y.WORD += getNextDiffY(crosshairPos.y.WORD,
-            (SWord)(CROSSHAIRS_SPEED + (0x100 * key_is_down(KEY_L))), dPadDir);
+            (SWord)(CROSSHAIRS_SPEED >> (key_is_down(KEY_L) != 0)), dPadDir);
     }
     player->angle = ArcTan2((crosshairPos.x.HALF.HI + scene->screenX) - player->position.x.HALF.HI,
         player->position.y.HALF.HI - (crosshairPos.y.HALF.HI + scene->screenY));
@@ -56,9 +56,11 @@ void handleInput() {
         //     case 0x50: pushNewAttack(&northeastAtk); break;
         //     default: pushNewAttack(&crossAtk); break;
         // }
-        spawnFella(screenToWorldPos(crosshairPos));
+
+        // spawnFella(screenToWorldPos(crosshairPos));
+
+        switchGameState(PAUSE);
     }
-    player->attacksActive->firing = KEY_DOWN_NOW(KEY_R) != 0;
 
     bool isSpinning = checkForSpin(dPadDir);
     if (isSpinning) pushNewAttack(&crossAtk);
@@ -114,7 +116,7 @@ Position getNextPosition(Entity* player) {
         .y = handleCollisionY(player)
     };
     nextPos.y.HALF.HI = clamp(nextPos.y.HALF.HI, hBoxTOffset(player->hitbox) + 4,
-        scene->sceneData.mapHInMtiles * MT_WIDTH - hBoxBOffset(player->hitbox) - 1);
+        scene->sceneData.mapHInMtiles * MT_WIDTH - hBoxBOffset(player->hitbox) - 4);
     return nextPos;
 }
 
@@ -133,6 +135,7 @@ void dig(Entity* player, Scene* scene) {
 
 void updateAttacks() {
     AttackInstance* atkInst = entities->attacksActive;
+    atkInst->firing = KEY_DOWN_NOW(KEY_R) != 0;
     int atkIndex = 0;
     while (atkInst != NULL) {
         if (atkInst->next && atkInst->next->toBeDeleted) { // checking/deleting the next one cos no prev pointer

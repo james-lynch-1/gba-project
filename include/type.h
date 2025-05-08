@@ -22,11 +22,6 @@
 #define CORNER_COLL_MASK    0x00F0FF0Fu
 #define COLL_MASK           0xFFFFFFFFu
 
-enum State {
-    NORMAL,
-    TITLE
-};
-
 typedef enum {
     CHAR,
     DIRECTION,
@@ -76,6 +71,32 @@ enum AtkId {
     SEATK, SWATK, NWATK, NEATK,
     CATK
 };
+
+typedef enum GameStateEnum_ {
+    NORMAL,
+    TITLE,
+    PAUSE
+} GameStateEnum;
+
+typedef struct State_ { // for entity states (HSM)
+    struct State_* next;
+    void (*enterAction)();
+    void (*exitAction)();
+    void (*handleAPress)();
+    void (*handleBPress)();
+    void (*handleDPadPress)();
+    void (*handleLPress)();
+    void (*handleRPress)();
+    void (*handleStartPress)();
+    void (*handleSelectPress)();
+} State;
+
+typedef struct GameState_ { // for game states (FSM)
+    GameStateEnum gameStateEnum;
+    void (*enterFunction)();
+    void (*exitFunction)();
+    void (*updateFunction)();
+} GameState;
 
 /** Collision data for 16 metatiles (1 SBB row / 1 32 tile-wide map) packed into two words.
 4 bits/tile -> 16 possible collision types per tile */

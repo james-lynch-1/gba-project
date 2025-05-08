@@ -14,14 +14,50 @@ void initialise() {
     loadSprites();
     loadUI();
     loadTiles();
+
+    setGameState(TITLE);
+
+    gameState.enterFunction();
 }
 
+void switchGameState(GameStateEnum gStateEnum) {
+    gameState.exitFunction();
+    setGameState(gStateEnum);
+    gameState.enterFunction();
+}
+
+void enterNormalState() {
+    entities->obj->attr0 |= ATTR0_AFF;
+    tte_erase_screen();
+}
+
+void enterTitleState() {
+    entities->obj->attr0 &= !ATTR0_AFF_DBL;
+    entities->obj->attr0 |= ATTR0_HIDE;
+    tte_set_pos(0,140);
+    tte_write("\n PRESS START!\n");
+}
+
+void enterPauseState() {
+    tte_write("PAUSED");
+}
 
 void loadUI() {
+    // load font
+    tte_init_se(
+        2,
+        BG_CBB(2) | BG_SBB(UI_SBB),
+        0,
+        CLR_FUCHSIA,
+        14,
+        NULL,
+        NULL
+    );
+
     // BG3 crosshairs
     memcpy32(&tile_mem[3][0], crosshairsTiles, crosshairsTilesLen / sizeof(u32));
     // BG2 countdown bar
-    memcpy32(&tile_mem[2][0], countdownTiles, countdownTilesLen / sizeof(u32));
+    memcpy32(&tile_mem[2][COUNTDOWN_OFFS], countdownTiles, countdownTilesLen / sizeof(u32));
     // basic atk sprite
     memcpy32(&tile_mem[4][80], basicCountdownTiles, basicCountdownTilesLen / sizeof(u32));
 
@@ -59,4 +95,27 @@ Scene* loadSceneInitial(SceneEnum sceneName) {
     Scene* scene = malloc(sizeof(Scene));
     loadScene(scene, sceneName);
     return scene;
+}
+
+void setGameState(GameStateEnum gStateEnum) {
+    gameState.gameStateEnum = gStateEnum;
+    switch (gStateEnum) {
+        case TITLE:
+            gameState.enterFunction = enterTitleState;
+            gameState.exitFunction = doNothing;
+            gameState.updateFunction = updateGameTitle;
+            break;
+        case NORMAL:
+            gameState.enterFunction = enterNormalState;
+            gameState.exitFunction = doNothing;
+            gameState.updateFunction = updateGameNormal;
+            break;
+        case PAUSE:
+            gameState.enterFunction = enterPauseState;
+            gameState.exitFunction = doNothing;
+            gameState.updateFunction = updateGamePause;
+        default:
+            log(CHAR, "no such state exists");
+            break;
+    }
 }

@@ -6,7 +6,7 @@ u32 frameCount = 0;
 OBJ_ATTR obj_buffer[128];
 OBJ_AFFINE* obj_aff_buffer = (OBJ_AFFINE*)obj_buffer;
 
-int state = NORMAL;
+GameState gameState;
 Entity* entities;
 Scene* scene = NULL;
 Viewport vp = { 0, 0, 0, 0, 0, 0 };

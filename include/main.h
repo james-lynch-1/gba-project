@@ -17,8 +17,7 @@
 #include "tile.h"
 #include "global.h"
 #include "title.h"
-
-extern void (* const updateGameFns[])();
+#include "pause.h"
 
 void updateGameNormal();
 

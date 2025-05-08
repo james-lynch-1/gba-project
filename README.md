@@ -5,11 +5,10 @@ Use mGBA https://mgba.io/ to run it, or actual hardware I suppose
 ## CONTROLS:
 D-pad: move crosshair  
 Spin D-pad: charge cross attack (max. 4 attacks active at once)  
-L: Increase crosshair movement speed  
+L: Slow crosshair movement speed  
 R: Fire basic attack  
 A: Move character in direction of reticle  
-Start: Add new attack to attack list (debug feature)  
-(Hold one of the eight directions to change the attack type (cardinal + diagonals), or no direction for a cross-shaped attack.)  
+Start: Pause
 Select: Change area  
 You can also go to the left/right edge of the screen to load a new area (you may become stuck).  
 

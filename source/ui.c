@@ -21,7 +21,7 @@ void updateQuadCountdownUI(AttackInstance* atkInst, int atkIndex) {
     // for when the next one runs out and we gotta clear it cos that bar is moving up in the world
     memset32(&se_mem[UI_SBB][(atkNum + 1) * 32], 0, 15);
     // fill a row with bar
-    memset16(&se_mem[UI_SBB][atkNum * 32 + 30 - t], 1, t);
+    memset16(&se_mem[UI_SBB][atkNum * 32 + 30 - t], COUNTDOWN_OFFS + 1, t);
     if (atkInst->timer > atk->duration) { // in countdown
         for (int i = 0; i < 30; i++) se_mem[UI_SBB][atkNum * 32 + i] |= SE_PALBANK(15); // red (duration)
     }

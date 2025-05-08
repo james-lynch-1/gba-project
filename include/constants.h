@@ -31,18 +31,20 @@
 #define COLL_BITWIDTH       4
 
 // SBB defines
-/** Screen base block for bars (attack countdown/duration) layer */
+/** Screen base block for bars (attack countdown/duration) and text layer */
 #define UI_SBB              26
 /** Screen base block for crosshair layer */
 #define CHAIR_SBB           27
 /** Screen base block for map layer */
 #define MAP_SBB             31
+/** Offset for countdown bars after text in memory */
+#define COUNTDOWN_OFFS      95
 
 #define CROSSHAIRS_X_MIN    8
 #define CROSSHAIRS_X_MAX    SCR_W - 8
 #define CROSSHAIRS_Y_MIN    8
 #define CROSSHAIRS_Y_MAX    SCR_H - 8
-#define CROSSHAIRS_SPEED    0x1C000
+#define CROSSHAIRS_SPEED    0x38000
 
 #define SPIN_WAIT_FRAMES    12
 #define NUM_SPINPUTS        9
