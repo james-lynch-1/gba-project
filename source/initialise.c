@@ -114,6 +114,7 @@ void setGameState(GameStateEnum gStateEnum) {
             gameState.enterFunction = enterPauseState;
             gameState.exitFunction = doNothing;
             gameState.updateFunction = updateGamePause;
+            break;
         default:
             log(CHAR, "no such state exists");
             break;

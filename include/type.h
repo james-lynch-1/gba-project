@@ -312,24 +312,20 @@ typedef struct Entity_ {
     u32 collision; // 4 bytes
     int angleOffset; // 4 bytes
     u16 angle; // 2 bytes
+    u16 attr0; // 2 bytes
+    u16 attr1; // 2 bytes
+    u16 attr2; // 2 bytes
     u16 angleVisual; // 2 bytes
-    u16 tid; // 2 bytes
     u16 remoteControlCountdown; // 2 bytes. No. of frames before control is handed back to the player. 65535 means indefinite
-    u8 affIndex; // 1 byte
     u8 ilk; // 1 byte
     u8 invincibleTime; // 1 byte
     u8 toBeDeleted; // 1 byte
 
     // visual
-    u8 pb; // 1 byte
     u8 animationState; // 1 byte
     u8 animFrames; // 1 byte. how many frames ent has been in current animation state
-    u8 numSprites; // 1 byte. how many sprites this entity has
     u8 width; // 1 byte
     u8 height; // 1 byte
-    u8 spriteShape; // 1 byte, needs to be shifted left by 12 to be used in OAM
-    u8 spriteSize; // 1 byte, needs to be shifted left by 12 to be used in OAM
-    u8 objectMode; // 1 byte, needs to be shifted left by ATTR0_MODE_SHIFT (8) to be used in OAM
 } Entity;
 
 typedef struct Node_ {

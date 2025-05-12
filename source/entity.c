@@ -21,21 +21,18 @@ Entity* loadPlayer() {
         .attacksActive = NULL,
         .obj = &obj_buffer[1],
         .obj_aff = &obj_aff_buffer[0],
+        .attr0 = 0 | ATTR0_AFF | ATTR0_4BPP | ATTR0_SQUARE,
+        .attr1 = 0 | ATTR1_AFF_ID(0) | ATTR1_SIZE_32x32,
+        .attr2 = ATTR2_ID(0) | ATTR2_PRIO(3) | ATTR2_PALBANK(0),
         .moveSprite = movePlayerSpriteOnScreen,
         .hitbox = playerHitbox,
-        .spriteShape = ATTR0_SQUARE >> 12,
-        .spriteSize = ATTR1_SIZE_32 >> 12,
-        .objectMode = ATTR0_AFF >> ATTR0_MODE_SHIFT,
-        .affIndex = ATTR1_AFF_ID(0),
-        .tid = 0,
-        .pb = 0,
         .ilk = PLAYER,
     };
     *entities = player;
     obj_set_attr(entities->obj,
-        entities->spriteShape << 12 | entities->objectMode << ATTR0_MODE_SHIFT,
-        entities->spriteSize << 12 | entities->affIndex,
-        ATTR2_PRIO(3) | ATTR2_PALBANK(entities->pb) | entities->tid);
+        entities->attr0,
+        entities->attr1,
+        entities->attr2);
     numEnts++;
     return entities;
 }
@@ -54,13 +51,7 @@ Entity* loadEnt() {
     }
     currEnt = malloc(sizeof(Entity));
     prevEnt->next = currEnt;
-    Entity newEnt =
-    {
-        .prev = prevEnt,
-        .next = NULL,
-        .obj = &obj_buffer[numEnts + 1],
-        .obj_aff = NULL
-    };
+    Entity newEnt = { .prev = prevEnt, .next = NULL, .obj = &obj_buffer[numEnts + 1], .obj_aff = NULL };
     *currEnt = newEnt;
     numEnts++;
     return currEnt;
@@ -75,18 +66,12 @@ void spawnFella(Position pos) {
         fella->health = 120;
         fella->animationState = ANIM_IDLE;
         fella->ilk = FELLA;
-        fella->tid = 64;
-        fella->pb = 1;
-        fella->spriteShape = ATTR0_SQUARE;
-        fella->spriteSize = ATTR1_SIZE_8;
-        fella->objectMode = ATTR0_REG;
-        fella->affIndex = 0;
+        fella->attr0 = 0 | ATTR0_REG | ATTR0_4BPP | ATTR0_SQUARE;
+        fella->attr1 = 0 | ATTR1_FLIP(0) | ATTR1_SIZE_8x8;
+        fella->attr2 = ATTR2_ID(64) | ATTR2_PRIO(3) | ATTR2_PALBANK(1);
         fella->moveSprite = moveSpriteOnScreen;
         fella->hitbox = fellaHitbox;
-        obj_set_attr(fella->obj,
-            fella->spriteShape | ATTR0_REG,
-            fella->spriteSize,
-            ATTR2_PRIO(3) | ATTR2_PALBANK(fella->pb) | ATTR2_ID(fella->tid));
+        obj_set_attr(fella->obj, fella->attr0, fella->attr1, fella->attr2);
     }
 }
 
@@ -94,7 +79,7 @@ void spawnFella(Position pos) {
 void updateEnts() {
     Position crosshairWorldPos = screenToWorldPos(crosshairPos);
     Entity* currEnt = entities->next; // not updating the player, handled elsewhere
-    int numEntsOnScreen = 2;
+    int numEntsOnScreen = 2; // player, reticle
     while (currEnt != NULL) {
         Entity* next = currEnt->next;
         if (currEnt->toBeDeleted) {
@@ -175,7 +160,7 @@ void updateAnimation(Entity* ent, u8 prevAnimState) {
     }
     switch (ent->animationState) {
         case ANIM_IDLE:
-            ent->obj->attr2 = ATTR2_PRIO(3) | ATTR2_PALBANK(ent->pb) | ent->tid;
+            ent->obj->attr2 = ent->attr2;
             break;
         case ANIM_HURT:
             offset.x.HALF.HI = qran_range(-3, 3);
@@ -186,20 +171,19 @@ void updateAnimation(Entity* ent, u8 prevAnimState) {
                 case 32:
                     frames = 0;
                 case 0:
-                    ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
-                    ent->obj->attr2 |= ATTR2_ID(0) | ATTR2_PALBANK(ent->pb);
+                    ent->obj->attr2 = ent->attr2;
                     break;
                 case 8:
                     ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
-                    ent->obj->attr2 |= ATTR2_ID(16) | ATTR2_PALBANK(ent->pb);
+                    ent->obj->attr2 |= ATTR2_ID(16);
                     break;
                 case 16:
                     ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
-                    ent->obj->attr2 |= ATTR2_ID(32) | ATTR2_PALBANK(ent->pb);
+                    ent->obj->attr2 |= ATTR2_ID(32);
                     break;
                 case 24:
                     ent->obj->attr2 &= ATTR2_ID(!ATTR2_ID_MASK);
-                    ent->obj->attr2 |= ATTR2_ID(48) | ATTR2_PALBANK(ent->pb);
+                    ent->obj->attr2 |= ATTR2_ID(48);
                     break;
                 default:
                     break;
