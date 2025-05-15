@@ -23,6 +23,7 @@ int getNextDiffY(int y, SWord speed, u32 angle);
 u16 getAngle(Direction dir, u32 angle);
 SWord handleCollisionX(Entity* ent);
 SWord handleCollisionY(Entity* ent);
+int checkCollForAngleOffset(u32 coll, u16 angle);
 int decaySpeed(SWord speed, SWord radius);
 
 #endif

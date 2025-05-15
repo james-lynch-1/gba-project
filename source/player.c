@@ -68,10 +68,10 @@ void handleInput() {
     crosshairPos.y.WORD = clamp(crosshairPos.y.WORD, CROSSHAIRS_Y_MIN << 16, (CROSSHAIRS_Y_MAX) << 16);
 
     player->angleOffset = 0;
-    int cornerMaskOffsets[4] = { 0, 8, 12, 20 };
-    int i = 0;
-    while (player->angleOffset == 0 && i < 4)
-        player->angleOffset = getAngleOffset(player->angle, (player->collision >> cornerMaskOffsets[i++]) & 0xF);
+    // int cornerMaskOffsets[4] = { 0, 8, 12, 20 };
+    // int i = 0;
+    // while (player->angleOffset == 0 && i < 4)
+    //     player->angleOffset = getAngleOffset(player->angle, (player->collision >> cornerMaskOffsets[i++]) & 0xF);
 
     player->collision = 0;
     Position nextPos = getNextPosition(player);
@@ -115,6 +115,11 @@ Position getNextPosition(Entity* player) {
         .x = handleCollisionX(player),
         .y = handleCollisionY(player)
     };
+    player->angleOffset = checkCollForAngleOffset(player->collision, player->angle);
+    if (player->angleOffset) {
+        nextPos.x = handleCollisionX(player);
+        nextPos.y = handleCollisionY(player);
+    }
     nextPos.y.HALF.HI = clamp(nextPos.y.HALF.HI, hBoxTOffset(player->hitbox) + 4,
         scene->sceneData.mapHInMtiles * MT_WIDTH - hBoxBOffset(player->hitbox) - 4);
     return nextPos;
@@ -264,6 +269,13 @@ SWord handleCollisionY(Entity* ent) {
         if (speedTest.HALF.HI == 1) ent->collision |= coll;
     } while (coll == 0 && speedTest.WORD < speed.WORD);
     return posArr[coll == 0].y;
+}
+
+int checkCollForAngleOffset(u32 coll, u16 angle) {
+    int cornerMaskOffsets[4] = { 0, 8, 12, 20 }, angleOffset = 0, i = 0;
+    while (angleOffset == 0 && i < 4)
+        angleOffset = getAngleOffset(angle, (coll >> cornerMaskOffsets[i++]) & 0xF);
+    return angleOffset;
 }
 
 inline int decaySpeed(SWord speed, SWord radius) {
